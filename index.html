@@ -8,11 +8,11 @@
   <meta property="og:title" content="Real Bird or Fake?">
   <meta property="og:description" content="Three birds. One is fake. Can you spot it?">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="<https://realbirdorfake.com>">
+  <meta property="og:url" content="https://realbirdorfake.com">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Real Bird or Fake?">
   <meta name="twitter:description" content="Three birds. One is fake. Can you spot it?">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='<http://www.w3.org/2000/svg' viewBox='0 0 100 100>'><text y='.9em' font-size='90'>🐦</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐦</text></svg>">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -141,7 +141,7 @@
       font-weight: 700;
     }
 
-    .<result-header.win>  { background: #1a4a2a; color: #7ec87e; }
+    .result-header.win  { background: #1a4a2a; color: #7ec87e; }
     .result-header.lose { background: #3a1a1a; color: #e07070; }
 
     .real-birds { display: flex; flex-direction: column; }
@@ -224,44 +224,41 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      padding: 4px 10px 10px;
-      font-size: 0.82rem;
-      color: #8aaa7a;
+      gap: 8px;
+      padding: 0 10px 8px;
+      font-size: 0.72rem;
+      color: #5a7a5a;
     }
 
     .diff-pills {
       display: flex;
-      background: #1e321e;
-      border-radius: 20px;
-      padding: 3px;
       gap: 2px;
     }
 
     .diff-btn {
       background: transparent;
-      border: none;
-      border-radius: 16px;
-      padding: 5px 12px;
-      font-size: 0.78rem;
+      border: 1px solid #2d452d;
+      border-radius: 10px;
+      padding: 3px 9px;
+      font-size: 0.70rem;
       font-weight: 600;
-      color: #6a8a6a;
+      color: #5a7a5a;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       transition: all 0.15s ease;
     }
 
     .diff-btn.active {
-      background: #3d5a3d;
-      color: #c8e8b8;
+      background: #2d452d;
+      border-color: #3d5a3d;
+      color: #9ab88a;
     }
 
-    .diff-btn:active { transform: scale(0.95); }
+    .diff-btn:active { opacity: 0.7; }
 
     .adaptive-label {
-      font-size: 0.72rem;
-      color: #6a8a6a;
-      min-width: 50px;
+      font-size: 0.68rem;
+      color: #5a7a5a;
     }
   </style>
 </head>
@@ -281,11 +278,11 @@
   <span>Difficulty:</span>
   <div class="diff-pills">
     <button class="diff-btn" data-level="easy" onclick="setDifficulty('easy')">Easy</button>
-    <button class="diff-btn" data-level="medium" onclick="setDifficulty('medium')">Medium</button>
+    <button class="diff-btn" data-level="medium" onclick="setDifficulty('medium')">Med</button>
     <button class="diff-btn" data-level="hard" onclick="setDifficulty('hard')">Hard</button>
     <button class="diff-btn active" data-level="auto" onclick="setDifficulty('auto')">Auto</button>
   </div>
-  <span class="adaptive-label" id="adaptive-label"></span>
+  <span class="adaptive-label" id="adaptive-label">(medium)</span>
 </div>
 
 <div id="game-screen">
@@ -301,15 +298,19 @@
 
 <script>
 // ── Difficulty settings ───────────────────────────────────────────────────────
+// Weights for each fake-name style per difficulty level.
+// short  → single compound word, e.g. "Greysnipe", "Marshchat"       (easy to spot)
+// medium → adjective + compound,  e.g. "Russet Thornwren"            (moderate)
+// hard   → hyphenated almost-real, e.g. "Pale-crowned Dustwren"      (hard to spot)
 const DIFFICULTY_MIX = {
   easy:   { short: 0.70, medium: 0.30, hard: 0.00 },
   medium: { short: 0.25, medium: 0.40, hard: 0.35 },
   hard:   { short: 0.00, medium: 0.15, hard: 0.85 },
 };
 
-let selectedDifficulty = 'auto';
+let selectedDifficulty = 'auto'; // 'easy' | 'medium' | 'hard' | 'auto'
 let adaptiveDifficulty = 'medium';
-let recentResults = [];
+let recentResults = [];          // last 5 booleans (true=correct)
 
 function getCurrentMix() {
   const level = selectedDifficulty === 'auto' ? adaptiveDifficulty : selectedDifficulty;
@@ -342,7 +343,11 @@ function updateAdaptiveDifficulty(correct) {
 
 function updateAdaptiveLabel() {
   const el = document.getElementById('adaptive-label');
-  el.textContent = selectedDifficulty === 'auto' ? `(${adaptiveDifficulty})` : '';
+  if (selectedDifficulty === 'auto') {
+    el.textContent = `(${adaptiveDifficulty})`;
+  } else {
+    el.textContent = '';
+  }
 }
 
 // ── Fake name parts ──────────────────────────────────────────────────────────
@@ -487,7 +492,7 @@ async function fetchBirdPhoto(birdName) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 6000);
     const res = await fetch(
-      `<https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(birdName)}`>,
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(birdName)}`,
       { signal: controller.signal }
     );
     clearTimeout(timeout);
@@ -524,6 +529,7 @@ function startRound() {
 
   currentRound = { ...ROUNDS[idx], fake: generateFakeName() };
 
+  // Kick off photo fetches in background while user is thinking
   photoPromises = currentRound.real.map(b => fetchBirdPhoto(b.name));
 
   const options = shuffle([
@@ -579,6 +585,7 @@ async function handleGuess(pickedFake, pickedName) {
     : `✗ Nope! The fake was: ${currentRound.fake}`;
   header.className = `result-header ${pickedFake ? 'win' : 'lose'}`;
 
+  // Build result panel with photo placeholders
   const info = document.getElementById('real-birds-info');
   info.innerHTML = '';
   currentRound.real.forEach((bird, i) => {
@@ -602,6 +609,7 @@ async function handleGuess(pickedFake, pickedName) {
   panel.style.display = 'block';
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
+  // Resolve photos (likely already fetched while user was thinking)
   const photos = await Promise.all(photoPromises);
   photos.forEach((src, i) => {
     const wrap = document.getElementById(`photo-wrap-${i}`);
