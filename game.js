@@ -1,19 +1,8 @@
 // ── Photo fetching ───────────────────────────────────────────────────────────
-async function fetchBirdPhoto(birdName) {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6000);
-    const res = await fetch(
-      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(birdName)}`,
-      { signal: controller.signal }
-    );
-    clearTimeout(timeout);
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.thumbnail?.source ?? null;
-  } catch {
-    return null;
-  }
+// Photos are pre-saved in birds.js as bird.photo (populated by fetch-photos.js).
+// This function just returns the stored URL so there's no network call per round.
+function fetchBirdPhoto(bird) {
+  return Promise.resolve(bird.photo || null);
 }
 
 // ── Game state ───────────────────────────────────────────────────────────────
@@ -58,7 +47,7 @@ function startRound() {
   currentRound = { real: [bird1, bird2], fake: generateFakeName() };
 
   // Kick off photo fetches in background while user is thinking
-  photoPromises = currentRound.real.map(b => fetchBirdPhoto(b.name));
+  photoPromises = currentRound.real.map(b => fetchBirdPhoto(b));
 
   const options = shuffle([
     { name: currentRound.fake, isFake: true },
