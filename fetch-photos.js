@@ -39,21 +39,8 @@ function get(url) {
 async function fetchPhotoUrl(name) {
   const q = encodeURIComponent(name);
 
-  // First try: exact species match, birds only
-  try {
-    const r = await get(
-      `https://api.inaturalist.org/v1/taxa?q=${q}&rank=species&iconic_taxa=Aves&per_page=5`
-    );
-    for (const t of (r.results || [])) {
-      if (t.default_photo?.medium_url) return t.default_photo.medium_url;
-    }
-  } catch (e) {
-    if (e.message === 'rate-limited') throw e;
-  }
-
-  await sleep(300);
-
-  // Second try: any bird taxon (catches subspecies, genus pages, etc.)
+  // Birds only — iconic_taxa=Aves guarantees the taxon is classified as a bird.
+  // No fallback to other taxa; better to have no photo than a wrong one.
   try {
     const r = await get(
       `https://api.inaturalist.org/v1/taxa?q=${q}&iconic_taxa=Aves&per_page=5`
