@@ -244,3 +244,77 @@ h1 {
   font-size: 0.68rem;
   color: #5a7a5a;
 }
+
+.question-progress {
+  text-align: center;
+  font-size: 0.78rem;
+  color: #5a7a5a;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+#end-screen {
+  width: 100%;
+  max-width: 480px;
+  padding: 24px 16px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.end-content {
+  text-align: center;
+  background: #2a3d2a;
+  border-radius: 20px;
+  border: 1px solid #3d5a3d;
+  padding: 32px 24px;
+  width: 100%;
+}
+
+.end-content h2 {
+  font-size: 1.3rem;
+  color: #9ab88a;
+  margin-bottom: 16px;
+}
+
+.end-score-display {
+  font-size: 4rem;
+  font-weight: 800;
+  color: #7ec87e;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.out-of {
+  font-size: 2rem;
+  color: #4a6a4a;
+}
+
+.end-difficulty-label {
+  font-size: 0.82rem;
+  color: #5a7a5a;
+  margin-bottom: 24px;
+}
+
+.end-difficulty-label span {
+  color: #8aaa7a;
+}
+
+.end-next-section {
+  border-top: 1px solid #3d5a3d;
+  padding-top: 20px;
+}
+
+.end-next-label {
+  font-size: 0.85rem;
+  color: #7a9a7a;
+  margin-bottom: 10px;
+}
+
+.end-next-section .diff-pills {
+  justify-content: center;
+  margin-bottom: 16px;
+}

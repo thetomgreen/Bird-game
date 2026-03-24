@@ -40,13 +40,35 @@
 </div>
 
 <div id="game-screen">
+  <div id="question-progress" class="question-progress">Question 1 of 5</div>
   <p class="question">Tap the bird you think is <strong>made up</strong></p>
   <div class="bird-cards" id="bird-cards"></div>
   <div id="result-panel">
     <div class="result-header" id="result-header"></div>
     <div class="real-birds" id="real-birds-info"></div>
     <div class="streak" id="streak-display"></div>
-    <button class="next-btn" onclick="nextRound()">Next bird →</button>
+    <button class="next-btn" id="next-btn" onclick="nextRound()">Next bird →</button>
+  </div>
+</div>
+
+<div id="end-screen" style="display:none">
+  <div class="end-content">
+    <h2 id="end-title">Game Over!</h2>
+    <div class="end-score-display">
+      <span id="final-score">0</span><span class="out-of">/5</span>
+    </div>
+    <div class="end-difficulty-label">Difficulty: <span id="final-difficulty">Auto</span></div>
+    <div class="end-next-section">
+      <p class="end-next-label">Play again?</p>
+      <div class="diff-pills">
+        <button class="diff-btn" data-level="easy" onclick="setDifficultyOnly('easy')">Easy</button>
+        <button class="diff-btn" data-level="medium" onclick="setDifficultyOnly('medium')">Med</button>
+        <button class="diff-btn" data-level="hard" onclick="setDifficultyOnly('hard')">Hard</button>
+        <button class="diff-btn" data-level="expert" onclick="setDifficultyOnly('expert')">Expert</button>
+        <button class="diff-btn active" data-level="auto" onclick="setDifficultyOnly('auto')">Auto</button>
+      </div>
+      <button class="next-btn" onclick="startGame()">Play Again →</button>
+    </div>
   </div>
 </div>
 

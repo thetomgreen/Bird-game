@@ -17,6 +17,8 @@ async function fetchBirdPhoto(birdName) {
 }
 
 // ── Game state ───────────────────────────────────────────────────────────────
+const ROUNDS_PER_GAME = 5;
+let questionCount = 0, gameScore = 0;
 let score = 0, streak = 0, bestStreak = 0;
 let currentRound = null, answered = false;
 let birdPool = [];      // shuffled indices for main BIRDS pool
@@ -48,6 +50,9 @@ function pickTwoBirds() {
 
 function startRound() {
   answered = false;
+
+  document.getElementById('question-progress').textContent =
+    `Question ${questionCount + 1} of ${ROUNDS_PER_GAME}`;
 
   const [bird1, bird2] = pickTwoBirds();
   currentRound = { real: [bird1, bird2], fake: generateFakeName() };
@@ -81,6 +86,7 @@ async function handleGuess(pickedFake, pickedName) {
 
   if (pickedFake) {
     score++;
+    gameScore++;
     streak++;
     if (streak > bestStreak) bestStreak = streak;
   } else {
@@ -132,6 +138,11 @@ async function handleGuess(pickedFake, pickedName) {
   panel.style.display = 'block';
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
+  const nextBtn = document.getElementById('next-btn');
+  if (nextBtn) {
+    nextBtn.textContent = questionCount === ROUNDS_PER_GAME - 1 ? 'See Results →' : 'Next bird →';
+  }
+
   // Resolve photos (likely already fetched while user was thinking)
   const photos = await Promise.all(photoPromises);
   photos.forEach((src, i) => {
@@ -149,8 +160,49 @@ async function handleGuess(pickedFake, pickedName) {
 }
 
 function nextRound() {
+  questionCount++;
+  if (questionCount >= ROUNDS_PER_GAME) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(showEndScreen, 300);
+    return;
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
   setTimeout(startRound, 300);
 }
 
-startRound();
+function showEndScreen() {
+  const style = getStyle();
+  const diffLabel = selectedDifficulty === 'auto'
+    ? `Auto (${style})`
+    : selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
+
+  const messages = [
+    'Better luck next time! 🐣',
+    'Getting there! 🐤',
+    'Not bad! 🐦',
+    'Nice work! 🦅',
+    'Great game! 🦜',
+    'Perfect score! 🏆'
+  ];
+
+  document.getElementById('end-title').textContent = messages[gameScore] ?? 'Game Over!';
+  document.getElementById('final-score').textContent = gameScore;
+  document.getElementById('final-difficulty').textContent = diffLabel;
+
+  document.querySelectorAll('.diff-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.level === selectedDifficulty);
+  });
+
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('end-screen').style.display = 'block';
+}
+
+function startGame() {
+  questionCount = 0;
+  gameScore = 0;
+  document.getElementById('end-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  startRound();
+}
+
+startGame();

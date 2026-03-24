@@ -20,7 +20,15 @@ function setDifficulty(level) {
     b.classList.toggle('active', b.dataset.level === level);
   });
   updateAdaptiveLabel();
-  startRound();
+  startGame();
+}
+
+function setDifficultyOnly(level) {
+  selectedDifficulty = level;
+  document.querySelectorAll('.diff-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.level === level);
+  });
+  updateAdaptiveLabel();
 }
 
 function updateAdaptiveDifficulty(correct) {
