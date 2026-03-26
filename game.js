@@ -139,7 +139,11 @@ async function handleGuess(pickedFake, pickedName) {
     const img  = document.getElementById(`bird-photo-${i}`);
     if (!wrap || !img) return;
     if (src) {
-      img.onload  = () => img.classList.add('loaded');
+      img.onload  = () => {
+        img.classList.add('loaded');
+        const lbl = wrap.querySelector('.photo-loading');
+        if (lbl) lbl.style.display = 'none';
+      };
       img.onerror = () => { wrap.style.display = 'none'; };
       img.src = src;
     } else {
