@@ -165,13 +165,9 @@ function nextRound() {
 
 function showEndScreen() {
   const diffEl = document.getElementById('final-difficulty');
-  const diffWrap = diffEl.closest('.end-difficulty-label');
-  if (selectedDifficulty === 'auto') {
-    diffWrap.style.display = 'none';
-  } else {
-    diffWrap.style.display = '';
-    diffEl.textContent = selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
-  }
+  diffEl.textContent = selectedDifficulty === 'auto'
+    ? 'Auto'
+    : selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
 
   const messages = [
     'Better luck next time! 🐣',
