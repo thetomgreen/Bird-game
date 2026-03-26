@@ -46,6 +46,7 @@ async function fetchPhotoUrl(name) {
       `https://api.inaturalist.org/v1/taxa?q=${q}&iconic_taxa=Aves&per_page=5`
     );
     for (const t of (r.results || [])) {
+      if (t.iconic_taxon_name !== 'Aves') continue; // verify server actually returned a bird
       if (t.default_photo?.medium_url) return t.default_photo.medium_url;
     }
   } catch (e) {
