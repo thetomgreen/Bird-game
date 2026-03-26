@@ -5,13 +5,29 @@ function fetchBirdPhoto(bird) {
   return Promise.resolve(bird.photo || null);
 }
 
+// ── Bird pools ────────────────────────────────────────────────────────────────
+// Famous birds excluded from hard mode so recognisable names don't give it away.
+// Toco Toucan, Keel-billed Toucan, Victoria Crowned Pigeon, Hoatzin kept in all pools.
+const FAMOUS_NAMES = new Set([
+  'Ostrich', 'Indian Peafowl', 'Emu', 'Cassowary', 'Kiwi',
+  'Atlantic Puffin', 'Tufted Puffin', 'Snowy Owl', 'Barn Owl',
+  'Peregrine Falcon', 'Common Loon', 'Greater Roadrunner', 'Osprey',
+  'California Condor', 'Whooping Crane', 'Emperor Penguin',
+  'Wandering Albatross', 'Blue-footed Booby', 'Mandarin Duck',
+  'Harpy Eagle', 'Resplendent Quetzal', 'Kakapo', 'Laughing Kookaburra',
+  'Bee Hummingbird', 'Andean Condor', 'Red-tailed Hawk',
+  'Superb Lyrebird', 'Magnificent Frigatebird', 'Roseate Spoonbill',
+]);
+const OBSCURE_BIRDS = BIRDS.filter(b => !FAMOUS_NAMES.has(b.name));
+
 // ── Game state ───────────────────────────────────────────────────────────────
 const ROUNDS_PER_GAME = 5;
 let questionCount = 0, gameScore = 0;
 let score = 0, streak = 0, bestStreak = 0;
 let currentRound = null, answered = false;
-let birdPool = [];      // shuffled indices for main BIRDS pool
-let hardBirdPool = [];  // shuffled indices for HARD_BIRDS pool
+let birdPool = [];        // shuffled indices for main BIRDS pool (easy/medium)
+let obscureBirdPool = []; // shuffled indices for OBSCURE_BIRDS (hard)
+let hardBirdPool = [];    // shuffled indices for HARD_BIRDS (expert)
 let photoPromises = [];
 
 function shuffle(arr) {
@@ -25,15 +41,15 @@ function shuffle(arr) {
 
 function pickTwoBirds() {
   const style = getStyle();
-  if (style === 'hard') {
-    if (hardBirdPool.length < 2) {
-      hardBirdPool = shuffle([...Array(HARD_BIRDS.length).keys()]);
-    }
+  if (style === 'expert') {
+    if (hardBirdPool.length < 2) hardBirdPool = shuffle([...Array(HARD_BIRDS.length).keys()]);
     return [HARD_BIRDS[hardBirdPool.pop()], HARD_BIRDS[hardBirdPool.pop()]];
   }
-  if (birdPool.length < 2) {
-    birdPool = shuffle([...Array(BIRDS.length).keys()]);
+  if (style === 'hard') {
+    if (obscureBirdPool.length < 2) obscureBirdPool = shuffle([...Array(OBSCURE_BIRDS.length).keys()]);
+    return [OBSCURE_BIRDS[obscureBirdPool.pop()], OBSCURE_BIRDS[obscureBirdPool.pop()]];
   }
+  if (birdPool.length < 2) birdPool = shuffle([...Array(BIRDS.length).keys()]);
   return [BIRDS[birdPool.pop()], BIRDS[birdPool.pop()]];
 }
 
