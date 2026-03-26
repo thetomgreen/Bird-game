@@ -25,7 +25,7 @@ h1 {
 
 .subtitle {
   font-size: 0.85rem;
-  color: #8aaa7a;
+  color: #b0cc9e;
   margin-top: 2px;
 }
 
@@ -35,7 +35,7 @@ h1 {
   justify-content: center;
   padding: 10px;
   font-size: 0.9rem;
-  color: #aac8aa;
+  color: #c0d8b0;
 }
 
 .score-bar span { font-weight: bold; color: #7ec87e; }
@@ -98,7 +98,7 @@ h1 {
 }
 
 .result-label {
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -157,7 +157,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4a6a4a;
+  color: #7a9a7a;
   font-size: 0.8rem;
 }
 
@@ -173,8 +173,8 @@ h1 {
 .bird-photo.loaded { opacity: 1; }
 
 .fun-fact {
-  font-size: 0.82rem;
-  color: #9ab88a;
+  font-size: 0.85rem;
+  color: #b8d0a4;
   line-height: 1.5;
 }
 
@@ -198,7 +198,7 @@ h1 {
 .streak {
   text-align: center;
   font-size: 0.82rem;
-  color: #8aaa7a;
+  color: #b0cc9e;
   padding-bottom: 8px;
 }
 
@@ -206,12 +206,17 @@ h1 {
 
 .difficulty-bar {
   display: flex;
+  width: fit-content;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0 10px 8px;
-  font-size: 0.72rem;
-  color: #5a7a5a;
+  padding: 6px 14px;
+  margin: 0 auto 8px;
+  font-size: 0.82rem;
+  color: #a0be90;
+  background: #243624;
+  border: 1px solid #3d5a3d;
+  border-radius: 20px;
 }
 
 .diff-pills {
@@ -221,34 +226,34 @@ h1 {
 
 .diff-btn {
   background: transparent;
-  border: 1px solid #2d452d;
+  border: 1px solid #3d5a3d;
   border-radius: 10px;
   padding: 3px 9px;
-  font-size: 0.70rem;
+  font-size: 0.80rem;
   font-weight: 600;
-  color: #5a7a5a;
+  color: #8aaa80;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: all 0.15s ease;
 }
 
 .diff-btn.active {
-  background: #2d452d;
-  border-color: #3d5a3d;
-  color: #9ab88a;
+  background: #3d5a3d;
+  border-color: #4d6a4d;
+  color: #c0d8a8;
 }
 
 .diff-btn:active { opacity: 0.7; }
 
 .adaptive-label {
-  font-size: 0.68rem;
-  color: #5a7a5a;
+  font-size: 0.78rem;
+  color: #8aaa80;
 }
 
 .question-progress {
   text-align: center;
-  font-size: 0.78rem;
-  color: #5a7a5a;
+  font-size: 0.85rem;
+  color: #8aaa80;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -290,17 +295,17 @@ h1 {
 
 .out-of {
   font-size: 2rem;
-  color: #4a6a4a;
+  color: #7a9a7a;
 }
 
 .end-difficulty-label {
   font-size: 0.82rem;
-  color: #5a7a5a;
+  color: #8aaa80;
   margin-bottom: 24px;
 }
 
 .end-difficulty-label span {
-  color: #8aaa7a;
+  color: #b0cc9e;
 }
 
 .end-next-section {
@@ -310,7 +315,7 @@ h1 {
 
 .end-next-label {
   font-size: 0.85rem;
-  color: #7a9a7a;
+  color: #a0be90;
   margin-bottom: 10px;
 }
 
