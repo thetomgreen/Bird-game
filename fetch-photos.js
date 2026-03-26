@@ -36,6 +36,20 @@ function get(url) {
   });
 }
 
+function normalizeName(s) {
+  return s.toLowerCase()
+    .replace(/-/g, ' ')
+    .replace(/\bgrey\b/g, 'gray')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function namesMatch(search, result) {
+  const s = normalizeName(search);
+  const r = normalizeName(result);
+  return r === s || r.endsWith(' ' + s);
+}
+
 async function fetchPhotoUrl(name) {
   const q = encodeURIComponent(name);
 
@@ -48,9 +62,8 @@ async function fetchPhotoUrl(name) {
     for (const t of (r.results || [])) {
       if (t.iconic_taxon_name !== 'Aves') continue;
       if (!t.default_photo?.medium_url) continue;
-      // Only accept if the common name matches what we searched for
-      const common = (t.preferred_common_name || '').toLowerCase();
-      if (common === name.toLowerCase()) return t.default_photo.medium_url;
+      if (!namesMatch(name, t.preferred_common_name || '')) continue;
+      return t.default_photo.medium_url;
     }
   } catch (e) {
     if (e.message === 'rate-limited') throw e;
