@@ -164,10 +164,14 @@ function nextRound() {
 }
 
 function showEndScreen() {
-  const style = getStyle();
-  const diffLabel = selectedDifficulty === 'auto'
-    ? `Auto (${style})`
-    : selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
+  const diffEl = document.getElementById('final-difficulty');
+  const diffWrap = diffEl.closest('.end-difficulty-label');
+  if (selectedDifficulty === 'auto') {
+    diffWrap.style.display = 'none';
+  } else {
+    diffWrap.style.display = '';
+    diffEl.textContent = selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
+  }
 
   const messages = [
     'Better luck next time! 🐣',
@@ -180,7 +184,6 @@ function showEndScreen() {
 
   document.getElementById('end-title').textContent = messages[gameScore] ?? 'Game Over!';
   document.getElementById('final-score').textContent = gameScore;
-  document.getElementById('final-difficulty').textContent = diffLabel;
 
   document.querySelectorAll('.diff-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.level === selectedDifficulty);
