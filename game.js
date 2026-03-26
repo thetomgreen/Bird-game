@@ -19,13 +19,15 @@ const FAMOUS_NAMES = new Set([
   'Bee Hummingbird', 'Andean Condor', 'Red-tailed Hawk',
 ]);
 const OBSCURE_BIRDS = BIRDS.filter(b => !FAMOUS_NAMES.has(b.name));
+const FAMOUS_BIRDS  = BIRDS.filter(b =>  FAMOUS_NAMES.has(b.name));
 
 // ── Game state ───────────────────────────────────────────────────────────────
 const ROUNDS_PER_GAME = 5;
 let questionCount = 0, gameScore = 0;
 let score = 0, streak = 0, bestStreak = 0;
 let currentRound = null, answered = false;
-let birdPool = [];        // shuffled indices for main BIRDS pool (easy/medium)
+let birdPool = [];        // shuffled indices for BIRDS (easy)
+let famousBirdPool = [];  // shuffled indices for FAMOUS_BIRDS (medium)
 let obscureBirdPool = []; // shuffled indices for OBSCURE_BIRDS (hard)
 let hardBirdPool = [];    // shuffled indices for HARD_BIRDS (expert)
 let photoPromises = [];
@@ -48,6 +50,10 @@ function pickTwoBirds() {
   if (style === 'hard') {
     if (obscureBirdPool.length < 2) obscureBirdPool = shuffle([...Array(OBSCURE_BIRDS.length).keys()]);
     return [OBSCURE_BIRDS[obscureBirdPool.pop()], OBSCURE_BIRDS[obscureBirdPool.pop()]];
+  }
+  if (style === 'medium') {
+    if (famousBirdPool.length < 2) famousBirdPool = shuffle([...Array(FAMOUS_BIRDS.length).keys()]);
+    return [FAMOUS_BIRDS[famousBirdPool.pop()], FAMOUS_BIRDS[famousBirdPool.pop()]];
   }
   if (birdPool.length < 2) birdPool = shuffle([...Array(BIRDS.length).keys()]);
   return [BIRDS[birdPool.pop()], BIRDS[birdPool.pop()]];
