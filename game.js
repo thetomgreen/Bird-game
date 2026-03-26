@@ -8,15 +8,15 @@ function fetchBirdPhoto(bird) {
 // ── Bird pools ────────────────────────────────────────────────────────────────
 // Famous birds excluded from hard mode so recognisable names don't give it away.
 // Toco Toucan, Keel-billed Toucan, Victoria Crowned Pigeon, Hoatzin kept in all pools.
+// Wandering Albatross, Blue-footed Booby, Tufted Puffin, Roseate Spoonbill,
+// Superb Lyrebird, Laughing Kookaburra, Magnificent Frigatebird kept in hard (easier).
 const FAMOUS_NAMES = new Set([
   'Ostrich', 'Indian Peafowl', 'Emu', 'Cassowary', 'Kiwi',
-  'Atlantic Puffin', 'Tufted Puffin', 'Snowy Owl', 'Barn Owl',
+  'Atlantic Puffin', 'Snowy Owl', 'Barn Owl',
   'Peregrine Falcon', 'Common Loon', 'Greater Roadrunner', 'Osprey',
   'California Condor', 'Whooping Crane', 'Emperor Penguin',
-  'Wandering Albatross', 'Blue-footed Booby', 'Mandarin Duck',
-  'Harpy Eagle', 'Resplendent Quetzal', 'Kakapo', 'Laughing Kookaburra',
+  'Mandarin Duck', 'Harpy Eagle', 'Resplendent Quetzal', 'Kakapo',
   'Bee Hummingbird', 'Andean Condor', 'Red-tailed Hawk',
-  'Superb Lyrebird', 'Magnificent Frigatebird', 'Roseate Spoonbill',
 ]);
 const OBSCURE_BIRDS = BIRDS.filter(b => !FAMOUS_NAMES.has(b.name));
 

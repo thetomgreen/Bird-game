@@ -4,7 +4,8 @@
 //
 // easy   → silly/funny names (Boingbird, Wobbly Flumpwren, Greater Giggly Noodlelark)
 // medium → plausible invented names (Greysnipe, Dusky Thornwren, Pale-crowned Reedwarbler)
-// hard   → convincing real-bird-pattern names (Yellow-naped Warbler, Lesser Rufous-fronted Pipit)
+// hard   → medium-style fakes (easier to spot against obscure real birds)
+// expert → ultra-convincing fakes mimicking HARD_BIRDS compound naming patterns
 
 let selectedDifficulty = 'auto';
 let adaptiveDifficulty = 'medium';
@@ -134,6 +135,24 @@ const SNEAKY = {
              'Mountain','Forest','Highland','Coastal','Island','Desert','Marsh'],
 };
 
+// EXPERT: ultra-convincing — mimics HARD_BIRDS compound naming patterns
+// e.g. "Rufous-bellied Cisticola", "Bornean Chestnut-backed Tit-babbler"
+const ULTRA = {
+  color:    [...SNEAKY.color, 'Marbled', 'Streaked', 'Scaly', 'Mottled', 'Scaled',
+             'Banded', 'Barred', 'Spotted', 'Freckled', 'Flecked'],
+  bodyPart: [...SNEAKY.bodyPart, 'sided', 'mantled', 'lored', 'tipped', 'washed',
+             'fringed', 'streaked', 'mottled', 'scaled'],
+  type:     ['Cisticola', 'Prinia', 'Fulvetta', 'Niltava', 'Flufftail', 'Tit-babbler',
+             'Wren-babbler', 'Bush-warbler', 'Reed-warbler', 'Foliage-gleaner',
+             'Woodcreeper', 'Antshrike', 'Antpitta', 'Laughingthrush', 'Puffbird',
+             'Nunlet', 'Spinetail', 'Thornbill', 'Broadbill', 'Babbler',
+             'Honeyeater', 'Flowerpecker', 'Sunbird', 'Bee-eater', 'Kingfisher',
+             'Philentoma', 'Malimbe', 'Pytilia', 'Firefinch', 'Indigobird'],
+  scale:    [...SNEAKY.scale],
+  geo:      [...SNEAKY.geo, 'Papuan', 'Sulawesi', 'Philippine', 'Javan',
+             'Wallacean', 'Moluccan', 'Sundaic'],
+};
+
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 const usedFakeNames = new Set();
@@ -164,8 +183,29 @@ function generateFakeName() {
           name = `${pick(PLAUSIBLE.scale)} ${pick(PLAUSIBLE.longHab)}${pick(PLAUSIBLE.longType)}`;
         }
       }
-    } else { // hard — always "Color-bodypart Type" so it matches the real birds shown
-      name = `${pick(SNEAKY.color)}-${pick(SNEAKY.bodyPart)} ${pick(SNEAKY.type)}`;
+    } else if (style === 'expert') {
+      // Ultra-convincing — mimics HARD_BIRDS compound naming patterns
+      if (len === 0) {
+        name = `${pick(ULTRA.color)}-${pick(ULTRA.bodyPart)} ${pick(ULTRA.type)}`;
+      } else if (len === 1) {
+        name = `${pick(ULTRA.scale)} ${pick(ULTRA.color)}-${pick(ULTRA.bodyPart)} ${pick(ULTRA.type)}`;
+      } else {
+        name = `${pick(ULTRA.geo)} ${pick(ULTRA.color)}-${pick(ULTRA.bodyPart)} ${pick(ULTRA.type)}`;
+      }
+    } else {
+      // hard (and auto-hard) — medium-style fakes, easier to spot against obscure real birds
+      if (len === 0) {
+        name = pick(PLAUSIBLE.shortPre) + pick(PLAUSIBLE.shortSuf);
+      } else if (len === 1) {
+        const adj = Math.random() < 0.3 ? pick(PLAUSIBLE.medHyphen) : pick(PLAUSIBLE.medSimple);
+        name = `${adj} ${pick(PLAUSIBLE.medMod)}${pick(PLAUSIBLE.medType)}`;
+      } else {
+        if (Math.random() < 0.7) {
+          name = `${pick(PLAUSIBLE.longColor)}-${pick(PLAUSIBLE.longPart)} ${pick(PLAUSIBLE.longHab)}${pick(PLAUSIBLE.longType)}`;
+        } else {
+          name = `${pick(PLAUSIBLE.scale)} ${pick(PLAUSIBLE.longHab)}${pick(PLAUSIBLE.longType)}`;
+        }
+      }
     }
     attempts++;
   } while (usedFakeNames.has(name) && attempts < 100);
