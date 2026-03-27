@@ -21,7 +21,8 @@ const path  = require('path');
 const API_KEY   = process.env.OPENAI_API_KEY;
 const OUT_DIR   = path.join(__dirname, 'fake-bird-images');
 const GAME_FILE = path.join(__dirname, 'game.js');
-const TOTAL     = 100;
+const COUNT_ARG = parseInt(process.argv[2] || '100', 10);
+const TOTAL     = isNaN(COUNT_ARG) ? 100 : COUNT_ARG;
 const DELAY_MS  = 12000; // 12s gap — DALL-E 3 rate limit ~5 req/min
 
 if (!API_KEY) {
@@ -128,40 +129,83 @@ const PART_MAP = {
   washed:'washed across the plumage',fringed:'fringed at the edges',
 };
 
+// Each description includes body shape, bill shape, posture and size cues
+// so DALL-E generates a silhouette that matches the bird type.
 const TYPE_HABITAT = {
-  warbler:'small insectivorous bird in dense vegetation',cisticola:'tiny grassland warbler',
-  prinia:'small long-tailed warbler in scrub',finch:'seed-eating bird with a stout bill',
-  tanager:'colourful forest bird with a thick bill',sparrow:'small ground-feeding bird',
-  flycatcher:'perch-hunting insectivore with an upright posture',vireo:'small canopy bird',
-  thrush:'medium-sized ground forager with a spotted breast',wren:'tiny energetic bird with a cocked tail',
-  nuthatch:'compact tree-climbing bird with a strong bill',kingfisher:'bright-coloured bird with a large dagger-like bill near water',
-  hawk:'medium raptor with broad wings',dove:'plump gentle bird with a small head',
-  plover:'compact shorebird with a short bill',heron:'tall wading bird with a long neck and dagger bill',
-  bunting:'seed-eating bird with colourful plumage',grosbeak:'large-billed seed-crushing bird',
-  swallow:'sleek aerial insectivore with long wings',pipit:'slim ground-walking bird',
-  babbler:'lively forest bird often seen in groups',sunbird:'small nectar-feeding bird with a curved bill and iridescent plumage',
-  honeyeater:'medium forest bird with a brush-tipped tongue',fulvetta:'small forest babbler',
-  niltava:'small blue-and-orange flycatcher in dark forest understorey','tit-babbler':'small active babbler in dense scrub',
-  'wren-babbler':'tiny secretive babbler on the forest floor','bush-warbler':'shy brown warbler in undergrowth',
-  'reed-warbler':'slender reed-bed warbler','foliage-gleaner':'brown furnariid gleaning insects from leaves',
-  woodcreeper:'brown bark-climbing furnariid',antshrike:'stocky antbird with a hooked bill in forest understorey',
-  antpitta:'round, virtually tail-less ground bird that bobs',laughingthrush:'medium noisy forest babbler',
-  puffbird:'rotund insectivore with a large head perched on bare branches',nunlet:'tiny brown puffbird',
-  spinetail:'long-tailed furnariid in grassland',thornbill:'tiny Australian warbler',
-  broadbill:'broad-billed forest bird with vivid colours',flowerpecker:'tiny berry-eating forest bird',
-  'bee-eater':'sleek colourful bird catching insects in flight','tit-babbler':'active babbler in dense bamboo',
-  malimbe:'red-and-black weaver in forest','pytilia':'small colourful African waxbill',
-  firefinch:'tiny red African waxbill',indigobird:'small parasitic finch',
-  drongo:'glossy black fork-tailed bird perching prominently',chat:'small ground or rock bird',
-  robin:'small round forest bird',redstart:'small insectivore with a quivering rufous tail',
-  wheatear:'open-country chat with a distinctive white rump',nightjar:'cryptic nocturnal bird resting on bare ground',
-  pitta:'jewel-like colourful ground bird',barbet:'thick-billed fruit-eating forest bird',
-  woodpecker:'tree-drumming bird with a chisel bill',trogon:'perch-sitting forest bird with brilliant green and red plumage',
-  lark:'streaked ground bird of open country',hawk:'broad-winged soaring raptor',
-  shrike:'hooked-billed predatory perching bird',diver:'streamlined aquatic bird',
-  runner:'fast-running ground bird',bird:'perching bird',finch:'stout-billed seed-eater',
-  wren:'tiny energetic bird',chat:'small ground bird',warbler:'small leaf-gleaning bird',
-  swift:'aerially adapted fast-flying bird',tern:'graceful seabird',
+  // Small passerines — thin bills, slim bodies
+  warbler:        'tiny slim bird with a thin pointed insect-catching bill, rounded head, short legs, perched in leafy vegetation',
+  cisticola:      'tiny round-bodied grassland bird with a very short thin bill, cocked tail, stubby wings, perched on a grass stem',
+  prinia:         'small slim bird with a long cocked tail, thin bill, and rounded head, perched in scrub',
+  'bush-warbler': 'small secretive brown bird with a rounded body, thin bill, short rounded wings and cocked tail in dense undergrowth',
+  'reed-warbler': 'slender upright bird with a thin pointed bill, flat forehead and long primary feathers, clinging to a reed stem',
+  thornbill:      'tiny round-bodied bird with an extremely short thin bill and notched tail, perched in a bush',
+  // Babblers — medium, social
+  babbler:        'medium-sized plump bird with a slightly curved bill, strong legs, rounded wings, perched in forest undergrowth',
+  fulvetta:       'small round-bodied forest bird with a short stubby bill, large eye, and short rounded tail',
+  'tit-babbler':  'small active bird with a short straight bill, rounded head, and long loose tail, clinging to bamboo stems',
+  'wren-babbler': 'tiny round secretive bird with almost no visible tail, short legs, and a short curved bill on the forest floor',
+  laughingthrush: 'medium-sized robust bird with a strong curved bill, long rounded tail, and powerful legs in forest understorey',
+  // Flycatchers — upright posture
+  flycatcher:     'small bird perched bolt-upright on a bare twig, with a broad flat bill, large eyes, and a slightly peaked crown',
+  niltava:        'small compact flycatcher with a broad flat bill, large eyes, upright posture, and a rounded tail, in dark forest',
+  // Finches / seed-eaters — thick bills
+  finch:          'small stocky bird with a thick conical seed-cracking bill, rounded head, and short strong legs',
+  grosbeak:       'medium-sized chunky bird with a very large rounded seed-crushing bill and a broad head',
+  bunting:        'small compact seed-eating bird with a short conical bill, rounded head, and notched tail, on open ground',
+  sparrow:        'small plump ground bird with a short thick bill, rounded head, and strong scratching feet',
+  indigobird:     'tiny finch-like bird with a short conical bill, compact body, and forked tail',
+  pytilia:        'small waxbill with a short conical bill, bright plumage, and rounded tail',
+  firefinch:      'tiny round-bodied waxbill with a very short stubby bill and a rounded tail',
+  malimbe:        'medium-sized weaver with a heavy pointed bill, strong legs, and a hanging nest in forest',
+  // Raptors — hooked bills, broad wings, talons
+  hawk:           'medium-sized raptor with broad rounded wings, a hooked bill, fierce yellow eyes, and sharp talons perched on a branch',
+  shrike:         'medium-sized predatory perching bird with a strongly hooked bill, long tail, and upright posture on an exposed perch',
+  // Waterbirds — long bills/necks/legs
+  heron:          'tall slender wading bird with a very long S-curved neck, long dagger-like bill, long legs, and broad wings, standing in water',
+  plover:         'compact round-bodied shorebird with a short straight bill, large eye, long legs, and upright stance on open ground',
+  kingfisher:     'compact stocky bird with a massive long dagger-like bill, very short tail, large head, and tiny feet near water',
+  'bee-eater':    'sleek colourful bird with a long slender down-curved bill, long pointed wings, and a long central tail spike on a wire',
+  swallow:        'aerodynamic bird with extremely long pointed wings, a short forked tail, a tiny bill with a wide gape, in flight',
+  tern:           'slender graceful seabird with a forked tail, pointed wings, and a sharp pointed bill, hovering over water',
+  diver:          'low-slung aquatic bird with a long torpedo-shaped body, pointed bill, and feet set far back, floating on water',
+  // Woodpeckers / climbers
+  woodpecker:     'medium-sized bird with a strong straight chisel-like bill, stiff pointed tail feathers used as a prop, and strong claws gripping a tree trunk',
+  woodcreeper:    'brown tree-climbing bird with a long stiff tail, long curved bill, and strong claws pressed against bark',
+  nuthatch:       'compact tree-climbing bird with a short strong bill, no visible neck, and strong feet, creeping head-first down a trunk',
+  // Doves / pigeons — round and plump
+  dove:           'plump round-bodied bird with a small rounded head, short bill, and short legs, walking on the ground',
+  // Nightjars — flat, cryptic
+  nightjar:       'flat cryptic mottled brown bird with an enormous wide gaping mouth, tiny bill, and long wings, resting on bare ground',
+  // Colourful perchers
+  trogon:         'medium-sized compact bird with a short rounded bill, very long square tail, upright posture, and brilliant metallic green upperparts and red belly',
+  pitta:          'plump round ground bird with very strong legs, a short tail, a stout bill, and jewel-like coloured plumage standing on the forest floor',
+  barbet:         'stocky compact bird with a large head, thick serrated bill, short neck, and vivid colours perched in a fruiting tree',
+  broadbill:      'compact bird with a broad flat wide gaping bill, rounded head, short neck, and vivid plumage in the forest mid-storey',
+  puffbird:       'rotund big-headed bird with a heavy hooked bill, short tail, and fluffy puffed-up plumage sitting motionless on a bare branch',
+  nunlet:         'tiny puffbird with an oversized head, heavy hooked bill, and puffed round body sitting still on a low branch',
+  sunbird:        'tiny iridescent bird with a long strongly down-curved tubular bill and pointed wings, hovering at a flower',
+  honeyeater:     'medium-sized bird with a long curved bill and a brush-tipped tongue, perched on a flowering branch',
+  flowerpecker:   'tiny plump berry-eating bird with a very short stubby bill, round body, and short tail perched on a berry-laden branch',
+  // Antbirds / ground birds
+  antshrike:      'stocky medium-sized bird with a heavy hooked bill, rounded wings, and a graduated tail, perching upright in forest undergrowth',
+  antpitta:       'nearly tailless round ground bird with very long legs, a short straight bill, and an upright bobbing posture on the forest floor',
+  'foliage-gleaner': 'slim brown furnariid with a slightly upturned bill, stiff tail, and strong legs, gleaning insects from dead leaves',
+  spinetail:      'slim long-tailed furnariid with stiff spine-tipped tail feathers, a short bill, and strong legs in grassland',
+  // Miscellaneous
+  pipit:          'slim ground-walking bird with a thin insect-catching bill, long tail that constantly bobs, and long hind claw',
+  lark:           'streaked brown ground bird with a short thick bill, flat head, long hind claw, and strong legs on open ground',
+  thrush:         'medium-sized upright bird with a slightly curved bill, round eye, spotted breast, and strong legs foraging on the ground',
+  robin:          'small round forest bird with a short thin bill, large eye, upright posture, and a rounded tail',
+  redstart:       'small slim bird with a thin bill, rounded head, upright stance, and a constantly quivering rufous tail',
+  wheatear:       'small upright ground bird with a short thin bill, long legs, and a bold white rump visible in flight, on rocky open ground',
+  chat:           'small upright ground or rock bird with a thin bill, large eye, and a frequently cocked tail',
+  vireo:          'small plump canopy bird with a slightly hooked bill, rounded head, and slow deliberate movements',
+  drongo:         'medium-sized glossy black bird with a deeply forked fish-tail, hooked bill, and upright perching posture on a prominent branch',
+  swift:          'aerodynamic bird with a tiny bill, very long scythe-like wings, and a short forked tail, screaming in flight',
+  wren:           'tiny energetic brown bird with a cocked upright tail, rounded body, thin bill, and short rounded wings',
+  runner:         'fast-running ground bird with long strong legs, an upright posture, long neck, and short wings',
+  bird:           'medium-sized perching bird with a straight bill, rounded head, and strong feet gripping a branch',
+  hawk:           'medium-sized raptor with broad rounded wings, a hooked bill, fierce yellow eyes, and sharp talons',
 };
 
 const GEO_HABITAT = {
@@ -289,6 +333,44 @@ function updateGameJs(entries) {
   fs.writeFileSync(GAME_FILE, src);
 }
 
+function writePreview(entries) {
+  const rows = entries.map((e, i) => {
+    const name = typeof e === 'string' ? e : e.name;
+    const file = typeof e === 'string' ? e : e.file;
+    const diff = (e && e.difficulty) || '';
+    return `
+    <div class="card">
+      <div class="num">#${i + 1} <span class="diff">${diff}</span></div>
+      <img src="fake-bird-images/${file}" alt="${name}" loading="lazy">
+      <div class="name">${name}</div>
+    </div>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fake Bird Image Preview</title>
+<style>
+  body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:16px; }
+  h1 { font-size:1.2rem; margin-bottom:16px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+  .card { background:#222; border-radius:10px; overflow:hidden; }
+  .card img { width:100%; display:block; aspect-ratio:1; object-fit:cover; }
+  .name { padding:8px 10px; font-size:0.85rem; font-weight:600; }
+  .num { padding:6px 10px 0; font-size:0.75rem; color:#888; }
+  .diff { color:#f0a030; font-size:0.7rem; }
+</style>
+</head>
+<body>
+<h1>Fake bird images — ${entries.length} generated</h1>
+<div class="grid">${rows}
+</div>
+</body>
+</html>`;
+  fs.writeFileSync(path.join(__dirname, 'preview.html'), html);
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -350,6 +432,7 @@ async function main() {
         await downloadImage(url, filepath);
         console.log('✓');
         entries.push({ name, file, difficulty: diff });
+        writePreview(entries);
         success = true;
         break;
       } catch (e) {
@@ -366,6 +449,7 @@ async function main() {
     // Save progress every 10 images
     if (success && entries.length % 10 === 0) {
       updateGameJs(entries);
+      writePreview(entries);
       console.log(`  ↳ progress saved (${entries.length} images)\n`);
     }
 
@@ -374,7 +458,8 @@ async function main() {
   }
 
   updateGameJs(entries);
-  console.log(`\nDone! ${entries.length} images. game.js updated.`);
+  writePreview(entries);
+  console.log(`\nDone! ${entries.length} images. Open preview.html to review.`);
 }
 
 main().catch(err => { console.error('\nFatal error:', err); process.exit(1); });
