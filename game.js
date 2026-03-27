@@ -1,6 +1,22 @@
 // ── Fake bird images (pre-generated AI art) ─────────────────────────────────
-// Populated by generate-fake-birds.js — each entry is a filename in fake-bird-images/
+// Populated by generate-fake-birds.js — each entry is { name, file, difficulty }
+// The game picks fake names from this pool so the image always matches the name.
 const FAKE_BIRD_IMAGES = [];
+
+// Pool management for fake names (mirrors the real-bird pool shuffling)
+let fakeImagePool = { easy: [], medium: [], hard: [], expert: [] };
+
+function pickFakeEntry() {
+  if (!FAKE_BIRD_IMAGES.length) return null;
+  const style = getStyle();
+  // Prefer matching difficulty; fall back to any
+  const matching = FAKE_BIRD_IMAGES.filter(e => e.difficulty === style);
+  const pool = matching.length ? matching : FAKE_BIRD_IMAGES;
+  if (!fakeImagePool[style] || fakeImagePool[style].length === 0) {
+    fakeImagePool[style] = shuffle([...Array(pool.length).keys()]);
+  }
+  return pool[fakeImagePool[style].pop()];
+}
 
 // ── Photo fetching ───────────────────────────────────────────────────────────
 // Photos are pre-saved in birds.js as bird.photo (populated by fetch-photos.js).
@@ -72,7 +88,12 @@ function startRound() {
     `Question ${questionCount + 1} of ${ROUNDS_PER_GAME}`;
 
   const [bird1, bird2] = pickTwoBirds();
-  currentRound = { real: [bird1, bird2], fake: generateFakeName() };
+  const fakeEntry = pickFakeEntry();
+  currentRound = {
+    real: [bird1, bird2],
+    fake: fakeEntry ? fakeEntry.name : generateFakeName(),
+    fakeImage: fakeEntry ? fakeEntry.file : null,
+  };
 
   // Kick off photo fetches in background while user is thinking
   photoPromises = currentRound.real.map(b => fetchBirdPhoto(b));
@@ -106,6 +127,15 @@ async function handleGuess(pickedFake, pickedName) {
   if (answered) return;
   answered = true;
 
+  if (selectedDifficulty === 'auto') updateAdaptiveDifficulty(pickedFake);
+
+  // Show suspense message, then reveal after 1s
+  const questionEl = document.querySelector('.question');
+  questionEl.className = 'question suspense';
+  questionEl.innerHTML = `Let's find out…`;
+
+  await new Promise(r => setTimeout(r, 1000));
+
   if (pickedFake) {
     score++;
     gameScore++;
@@ -115,17 +145,8 @@ async function handleGuess(pickedFake, pickedName) {
     streak = 0;
   }
 
-  if (selectedDifficulty === 'auto') updateAdaptiveDifficulty(pickedFake);
-
   document.getElementById('score').textContent = score;
   document.getElementById('best-streak').textContent = bestStreak;
-
-  // Show suspense message, then reveal after 0.5s
-  const questionEl = document.querySelector('.question');
-  questionEl.className = 'question suspense';
-  questionEl.innerHTML = `Let's find out…`;
-
-  await new Promise(r => setTimeout(r, 1000));
 
   // Update question text with result feedback
   if (pickedFake) {
@@ -186,11 +207,10 @@ async function handleGuess(pickedFake, pickedName) {
     }
 
     // "Imagine this bird" button on fake bird card
-    if (isFakeBtn && FAKE_BIRD_IMAGES.length > 0) {
+    if (isFakeBtn && currentRound.fakeImage) {
       const fakeName = btn.querySelector('.bird-name').textContent;
       const expand = document.createElement('div');
       expand.className = 'bird-expand fake-imagine';
-      const imgIdx = Math.floor(Math.random() * FAKE_BIRD_IMAGES.length);
       expand.innerHTML = `
         <button class="imagine-btn" onclick="this.style.display='none'; this.nextElementSibling.style.display='block';">
           🎨 Imagine this bird
@@ -198,7 +218,7 @@ async function handleGuess(pickedFake, pickedName) {
         <div class="fake-bird-reveal" style="display:none">
           <p class="imagine-caption">AI imagined: <em>${fakeName}</em></p>
           <div class="photo-wrap">
-            <img class="bird-photo loaded" src="fake-bird-images/${FAKE_BIRD_IMAGES[imgIdx]}" alt="AI imagined ${fakeName}">
+            <img class="bird-photo loaded" src="fake-bird-images/${currentRound.fakeImage}" alt="AI imagined ${fakeName}">
           </div>
         </div>
       `;
