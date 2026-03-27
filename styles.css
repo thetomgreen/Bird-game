@@ -124,8 +124,18 @@ h1 {
   border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-.question.correct { color: #4caf50; font-weight: 600; }
-.question.wrong   { color: #aaa;    font-weight: 600; }
+.question.correct { color: #4caf50; font-weight: 700; font-size: 1.3rem; }
+.question.wrong   { color: #aaa;    font-weight: 700; font-size: 1.3rem; }
+
+@keyframes pulse-dots {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+.question.suspense {
+  color: #e8e8e8;
+  font-style: italic;
+  animation: pulse-dots 0.5s ease-in-out;
+}
 
 /* RESULT PANEL */
 #result-panel {

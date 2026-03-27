@@ -116,16 +116,22 @@ async function handleGuess(pickedFake, pickedName) {
   document.getElementById('score').textContent = score;
   document.getElementById('best-streak').textContent = bestStreak;
 
-  // Update question text with result feedback
+  // Show suspense message, then reveal after 0.5s
   const questionEl = document.querySelector('.question');
+  questionEl.className = 'question suspense';
+  questionEl.innerHTML = `Let's find out…`;
+
+  await new Promise(r => setTimeout(r, 500));
+
+  // Update question text with result feedback
   if (pickedFake) {
     questionEl.className = 'question correct';
     questionEl.innerHTML = streak >= 3
-      ? `Correct! 🔥 ${streak} in a row!`
-      : `Correct!`;
+      ? `✓ Correct! 🔥 ${streak} in a row!`
+      : `✓ Correct!`;
   } else {
     questionEl.className = 'question wrong';
-    questionEl.innerHTML = `Wrong! The fake was: <em>${currentRound.fake}</em>`;
+    questionEl.innerHTML = `✗ Wrong! The fake was: <em>${currentRound.fake}</em>`;
   }
 
   document.querySelectorAll('.bird-btn').forEach(btn => {
