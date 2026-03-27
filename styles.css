@@ -86,8 +86,8 @@ h1 {
   animation: pulse-green 0.4s ease;
 }
 
-.bird-btn.wrong   { background: #4a1a1a; border-color: #e05050; }
-.bird-btn.reveal-fake { background: #4a1a1a; border-color: #e05050; }
+.bird-btn.wrong       { background: #2a2a2a; border-color: #666; }
+.bird-btn.reveal-fake { background: #2a2a2a; border-color: #666; }
 .bird-btn.reveal-real { background: #1a4a2a; border-color: #4caf50; }
 .bird-btn:disabled { cursor: default; }
 
@@ -105,8 +105,27 @@ h1 {
   margin-top: 6px;
 }
 
-.label-fake { color: #e05050; }
+.label-fake { color: #999; }
 .label-real { color: #4caf50; }
+
+.result-icon {
+  font-size: 2.8rem;
+  font-weight: 900;
+  text-align: center;
+  line-height: 1;
+  padding: 6px 0 2px;
+}
+.correct-icon { color: #4caf50; }
+.wrong-icon   { color: #888; }
+
+.bird-expand {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.question.correct { color: #4caf50; font-weight: 600; }
+.question.wrong   { color: #aaa;    font-weight: 600; }
 
 /* RESULT PANEL */
 #result-panel {

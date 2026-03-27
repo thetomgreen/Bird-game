@@ -75,9 +75,13 @@ function startRound() {
 
   const options = shuffle([
     { name: currentRound.fake, isFake: true },
-    { name: currentRound.real[0].name, isFake: false },
-    { name: currentRound.real[1].name, isFake: false }
+    { name: currentRound.real[0].name, isFake: false, birdIdx: 0 },
+    { name: currentRound.real[1].name, isFake: false, birdIdx: 1 }
   ]);
+
+  const questionEl = document.querySelector('.question');
+  questionEl.className = 'question';
+  questionEl.innerHTML = 'Tap the bird you think is <strong>made up</strong>';
 
   const cards = document.getElementById('bird-cards');
   cards.innerHTML = '';
@@ -85,6 +89,7 @@ function startRound() {
     const btn = document.createElement('button');
     btn.className = 'bird-btn';
     btn.dataset.fake = opt.isFake;
+    if (!opt.isFake) btn.dataset.birdIdx = opt.birdIdx;
     btn.innerHTML = `<div class="bird-name">${opt.name}</div>`;
     btn.onclick = () => handleGuess(opt.isFake, opt.name);
     cards.appendChild(btn);
@@ -111,37 +116,56 @@ async function handleGuess(pickedFake, pickedName) {
   document.getElementById('score').textContent = score;
   document.getElementById('best-streak').textContent = bestStreak;
 
+  // Update question text with result feedback
+  const questionEl = document.querySelector('.question');
+  if (pickedFake) {
+    questionEl.className = 'question correct';
+    questionEl.innerHTML = streak >= 3
+      ? `Correct! 🔥 ${streak} in a row!`
+      : `Correct!`;
+  } else {
+    questionEl.className = 'question wrong';
+    questionEl.innerHTML = `Wrong! The fake was: <em>${currentRound.fake}</em>`;
+  }
+
   document.querySelectorAll('.bird-btn').forEach(btn => {
     btn.disabled = true;
     const isFakeBtn = btn.dataset.fake === 'true';
     const wasClicked = btn.querySelector('.bird-name').textContent === pickedName;
+
     btn.classList.add(isFakeBtn ? 'reveal-fake' : 'reveal-real');
-    btn.innerHTML += `<div class="result-label ${isFakeBtn ? 'label-fake' : 'label-real'}">${isFakeBtn ? '✗ FAKE' : '✓ REAL'}</div>`;
     if (wasClicked && pickedFake)  btn.classList.add('correct');
     if (wasClicked && !pickedFake) btn.classList.add('wrong');
-  });
 
-  const header = document.getElementById('result-header');
-  header.textContent = pickedFake
-    ? (streak >= 3 ? `✓ Correct! 🔥 ${streak} in a row!` : '✓ Correct!')
-    : `✗ Nope! The fake was: ${currentRound.fake}`;
-  header.className = `result-header ${pickedFake ? 'win' : 'lose'}`;
+    // Big check or cross on the clicked card
+    if (wasClicked) {
+      const icon = document.createElement('div');
+      icon.className = pickedFake ? 'result-icon correct-icon' : 'result-icon wrong-icon';
+      icon.textContent = pickedFake ? '✓' : '✗';
+      btn.querySelector('.bird-name').after(icon);
+    }
 
-  // Build result panel with photo placeholders
-  const info = document.getElementById('real-birds-info');
-  info.innerHTML = '';
-  currentRound.real.forEach((bird, i) => {
-    const div = document.createElement('div');
-    div.className = 'real-bird';
-    div.innerHTML = `
-      <h3>${bird.name}</h3>
-      <div class="photo-wrap" id="photo-wrap-${i}">
-        <div class="photo-loading">loading photo…</div>
-        <img id="bird-photo-${i}" class="bird-photo" alt="${bird.name}">
-      </div>
-      <p class="fun-fact">${bird.fact}</p>
-    `;
-    info.appendChild(div);
+    // Bird/robot label
+    const label = document.createElement('div');
+    label.className = `result-label ${isFakeBtn ? 'label-fake' : 'label-real'}`;
+    label.textContent = isFakeBtn ? '🤖 Fake' : '🐦 Real';
+    btn.appendChild(label);
+
+    // Expand real bird cards with photo + fact
+    if (!isFakeBtn) {
+      const birdIdx = parseInt(btn.dataset.birdIdx);
+      const bird = currentRound.real[birdIdx];
+      const expand = document.createElement('div');
+      expand.className = 'bird-expand';
+      expand.innerHTML = `
+        <div class="photo-wrap" id="photo-wrap-${birdIdx}">
+          <div class="photo-loading">loading photo…</div>
+          <img id="bird-photo-${birdIdx}" class="bird-photo" alt="${bird.name}">
+        </div>
+        <p class="fun-fact">${bird.fact}</p>
+      `;
+      btn.appendChild(expand);
+    }
   });
 
   document.getElementById('streak-display').innerHTML =
@@ -149,7 +173,6 @@ async function handleGuess(pickedFake, pickedName) {
 
   const panel = document.getElementById('result-panel');
   panel.style.display = 'block';
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
   const nextBtn = document.getElementById('next-btn');
   if (nextBtn) {
