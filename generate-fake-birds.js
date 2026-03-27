@@ -210,7 +210,7 @@ function nameToPrompt(name) {
     desc += `, with ${colorDesc} plumage`;
   }
   if (geoDesc) desc += `, ${geoDesc}`;
-  desc += '. Natural lighting, sharp focus, shallow depth of field, National Geographic photography style. No text or labels.';
+  desc += '. Natural outdoor setting, natural lighting, sharp focus on the bird, shallow depth of field, National Geographic wildlife photography style. The image must show only the bird in its natural habitat — no people, no cameras, no equipment, no technology, no text, no labels, no watermarks.';
 
   return desc;
 }
