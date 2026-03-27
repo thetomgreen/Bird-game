@@ -369,3 +369,42 @@ h1 {
   justify-content: center;
   margin-bottom: 16px;
 }
+
+/* Fake bird AI image */
+.fake-imagine {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.imagine-btn {
+  display: block;
+  width: 100%;
+  background: #3a3a3a;
+  border: 1px solid #555;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e8e8e8;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease;
+}
+
+.imagine-btn:active { background: #4a4a4a; }
+
+.imagine-caption {
+  font-size: 0.85rem;
+  color: #cccccc;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.fake-bird-reveal .photo-wrap {
+  min-height: 200px;
+}
+
+.fake-bird-reveal .bird-photo {
+  opacity: 1;
+}

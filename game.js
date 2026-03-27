@@ -1,3 +1,7 @@
+// ── Fake bird images (pre-generated AI art) ─────────────────────────────────
+// Populated by generate-fake-birds.js — each entry is a filename in fake-bird-images/
+const FAKE_BIRD_IMAGES = [];
+
 // ── Photo fetching ───────────────────────────────────────────────────────────
 // Photos are pre-saved in birds.js as bird.photo (populated by fetch-photos.js).
 // This function just returns the stored URL so there's no network call per round.
@@ -177,6 +181,26 @@ async function handleGuess(pickedFake, pickedName) {
           <img id="bird-photo-${birdIdx}" class="bird-photo" alt="${bird.name}">
         </div>
         <p class="fun-fact">${bird.fact}</p>
+      `;
+      btn.appendChild(expand);
+    }
+
+    // "Imagine this bird" button on fake bird card
+    if (isFakeBtn && FAKE_BIRD_IMAGES.length > 0) {
+      const fakeName = btn.querySelector('.bird-name').textContent;
+      const expand = document.createElement('div');
+      expand.className = 'bird-expand fake-imagine';
+      const imgIdx = Math.floor(Math.random() * FAKE_BIRD_IMAGES.length);
+      expand.innerHTML = `
+        <button class="imagine-btn" onclick="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          🎨 Imagine this bird
+        </button>
+        <div class="fake-bird-reveal" style="display:none">
+          <p class="imagine-caption">AI imagined: <em>${fakeName}</em></p>
+          <div class="photo-wrap">
+            <img class="bird-photo loaded" src="fake-bird-images/${FAKE_BIRD_IMAGES[imgIdx]}" alt="AI imagined ${fakeName}">
+          </div>
+        </div>
       `;
       btn.appendChild(expand);
     }
