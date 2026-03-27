@@ -41,8 +41,10 @@ function updateAdaptiveDifficulty(correct) {
   if (correct3 === 3) {
     if (adaptiveDifficulty === 'easy')        adaptiveDifficulty = 'medium';
     else if (adaptiveDifficulty === 'medium') adaptiveDifficulty = 'hard';
+    else if (adaptiveDifficulty === 'hard')   adaptiveDifficulty = 'expert';
   } else if (correct3 <= 1) {
-    if (adaptiveDifficulty === 'hard')        adaptiveDifficulty = 'medium';
+    if (adaptiveDifficulty === 'expert')      adaptiveDifficulty = 'hard';
+    else if (adaptiveDifficulty === 'hard')   adaptiveDifficulty = 'medium';
     else if (adaptiveDifficulty === 'medium') adaptiveDifficulty = 'easy';
   }
   updateAdaptiveLabel();
