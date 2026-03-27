@@ -63,6 +63,7 @@ async function fetchPhotoUrl(name) {
       if (t.iconic_taxon_name !== 'Aves') continue;
       if (!t.default_photo?.medium_url) continue;
       if (!namesMatch(name, t.preferred_common_name || '')) continue;
+      process.stdout.write(`[matched: "${t.preferred_common_name}"] `);
       return t.default_photo.medium_url;
     }
   } catch (e) {
