@@ -18,8 +18,10 @@ const FAMOUS_NAMES = new Set([
   'Mandarin Duck', 'Harpy Eagle', 'Resplendent Quetzal', 'Kakapo',
   'Bee Hummingbird', 'Andean Condor', 'Red-tailed Hawk',
 ]);
-const OBSCURE_BIRDS = BIRDS.filter(b => !FAMOUS_NAMES.has(b.name));
-const FAMOUS_BIRDS  = BIRDS.filter(b =>  FAMOUS_NAMES.has(b.name));
+const OBSCURE_BIRDS  = BIRDS.filter(b => !FAMOUS_NAMES.has(b.name) && b.photo);
+const FAMOUS_BIRDS   = BIRDS.filter(b =>  FAMOUS_NAMES.has(b.name) && b.photo);
+const ALL_BIRDS      = BIRDS.filter(b => b.photo);
+const HARD_BIRDS_P   = HARD_BIRDS.filter(b => b.photo);
 
 // ── Game state ───────────────────────────────────────────────────────────────
 const ROUNDS_PER_GAME = 5;
@@ -44,8 +46,8 @@ function shuffle(arr) {
 function pickTwoBirds() {
   const style = getStyle();
   if (style === 'expert') {
-    if (hardBirdPool.length < 2) hardBirdPool = shuffle([...Array(HARD_BIRDS.length).keys()]);
-    return [HARD_BIRDS[hardBirdPool.pop()], HARD_BIRDS[hardBirdPool.pop()]];
+    if (hardBirdPool.length < 2) hardBirdPool = shuffle([...Array(HARD_BIRDS_P.length).keys()]);
+    return [HARD_BIRDS_P[hardBirdPool.pop()], HARD_BIRDS_P[hardBirdPool.pop()]];
   }
   if (style === 'hard') {
     if (obscureBirdPool.length < 2) obscureBirdPool = shuffle([...Array(OBSCURE_BIRDS.length).keys()]);
@@ -55,8 +57,8 @@ function pickTwoBirds() {
     if (famousBirdPool.length < 2) famousBirdPool = shuffle([...Array(FAMOUS_BIRDS.length).keys()]);
     return [FAMOUS_BIRDS[famousBirdPool.pop()], FAMOUS_BIRDS[famousBirdPool.pop()]];
   }
-  if (birdPool.length < 2) birdPool = shuffle([...Array(BIRDS.length).keys()]);
-  return [BIRDS[birdPool.pop()], BIRDS[birdPool.pop()]];
+  if (birdPool.length < 2) birdPool = shuffle([...Array(ALL_BIRDS.length).keys()]);
+  return [ALL_BIRDS[birdPool.pop()], ALL_BIRDS[birdPool.pop()]];
 }
 
 function startRound() {
