@@ -121,7 +121,7 @@ async function handleGuess(pickedFake, pickedName) {
   questionEl.className = 'question suspense';
   questionEl.innerHTML = `Let's find out…`;
 
-  await new Promise(r => setTimeout(r, 500));
+  await new Promise(r => setTimeout(r, 1000));
 
   // Update question text with result feedback
   if (pickedFake) {
@@ -147,7 +147,7 @@ async function handleGuess(pickedFake, pickedName) {
     if (wasClicked) {
       const icon = document.createElement('div');
       icon.className = pickedFake ? 'result-icon correct-icon' : 'result-icon wrong-icon';
-      icon.textContent = pickedFake ? '✓' : '✗';
+      icon.textContent = pickedFake ? '✓' : '✗ You picked';
       btn.querySelector('.bird-name').after(icon);
     }
 

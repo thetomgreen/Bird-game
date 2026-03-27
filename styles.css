@@ -81,20 +81,20 @@ h1 {
 }
 
 .bird-btn.correct {
-  background: #1a4a2a;
-  border-color: #4caf50;
-  animation: pulse-green 0.4s ease;
+  background: #1a2a4a;
+  border-color: #4a90d9;
+  animation: pulse-blue 0.4s ease;
 }
 
 .bird-btn.wrong       { background: #2a2a2a; border-color: #666; }
 .bird-btn.reveal-fake { background: #2a2a2a; border-color: #666; }
-.bird-btn.reveal-real { background: #1a4a2a; border-color: #4caf50; }
+.bird-btn.reveal-real { background: #1a2a4a; border-color: #4a90d9; }
 .bird-btn:disabled { cursor: default; }
 
-@keyframes pulse-green {
-  0%   { box-shadow: 0 0 0 0 rgba(76,175,80,0.4); }
-  70%  { box-shadow: 0 0 0 10px rgba(76,175,80,0); }
-  100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); }
+@keyframes pulse-blue {
+  0%   { box-shadow: 0 0 0 0 rgba(74,144,217,0.5); }
+  70%  { box-shadow: 0 0 0 10px rgba(74,144,217,0); }
+  100% { box-shadow: 0 0 0 0 rgba(74,144,217,0); }
 }
 
 .result-label {
@@ -106,7 +106,7 @@ h1 {
 }
 
 .label-fake { color: #999; }
-.label-real { color: #4caf50; }
+.label-real { color: #4a90d9; }
 
 .result-icon {
   font-size: 2.8rem;
@@ -115,7 +115,7 @@ h1 {
   line-height: 1;
   padding: 6px 0 2px;
 }
-.correct-icon { color: #4caf50; }
+.correct-icon { color: #4a90d9; }
 .wrong-icon   { color: #888; }
 
 .bird-expand {
@@ -124,17 +124,24 @@ h1 {
   border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-.question.correct { color: #4caf50; font-weight: 700; font-size: 1.3rem; }
+.question.correct { color: #4a90d9; font-weight: 700; font-size: 1.3rem; }
 .question.wrong   { color: #aaa;    font-weight: 700; font-size: 1.3rem; }
 
-@keyframes pulse-dots {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.3; }
+@keyframes suspense-pop {
+  0%   { transform: scale(1);    opacity: 0.6; letter-spacing: 0.02em; }
+  20%  { transform: scale(1.18); opacity: 1;   letter-spacing: 0.08em; }
+  50%  { transform: scale(1.12); opacity: 1;   letter-spacing: 0.06em; }
+  70%  { transform: scale(1.18); opacity: 1;   letter-spacing: 0.08em; }
+  100% { transform: scale(1.12); opacity: 1;   letter-spacing: 0.06em; }
 }
 .question.suspense {
-  color: #e8e8e8;
+  color: #f0c060;
   font-style: italic;
-  animation: pulse-dots 0.5s ease-in-out;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  display: block;
+  animation: suspense-pop 1s ease-in-out forwards;
 }
 
 /* RESULT PANEL */
