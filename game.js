@@ -147,8 +147,16 @@ async function handleGuess(pickedFake, pickedName) {
     if (wasClicked) {
       const icon = document.createElement('div');
       icon.className = pickedFake ? 'result-icon correct-icon' : 'result-icon wrong-icon';
-      icon.textContent = pickedFake ? '✓' : '✗ You picked';
-      btn.querySelector('.bird-name').after(icon);
+      icon.textContent = pickedFake ? '✓' : '✗';
+      btn.appendChild(icon);
+    }
+
+    // "You picked" tag on the selected wrong card
+    if (wasClicked && !pickedFake) {
+      const picked = document.createElement('div');
+      picked.className = 'you-picked-label';
+      picked.textContent = 'You picked';
+      btn.querySelector('.bird-name').after(picked);
     }
 
     // Bird/robot label

@@ -69,6 +69,7 @@ h1 {
   text-align: left;
   transition: all 0.15s ease;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
 }
 
 .bird-btn:active { transform: scale(0.97); }
@@ -109,14 +110,23 @@ h1 {
 .label-real { color: #4a90d9; }
 
 .result-icon {
+  position: absolute;
+  top: 14px;
+  right: 16px;
   font-size: 2.8rem;
   font-weight: 900;
-  text-align: center;
   line-height: 1;
-  padding: 6px 0 2px;
 }
 .correct-icon { color: #4a90d9; }
-.wrong-icon   { color: #888; }
+.wrong-icon   { color: #e05050; }
+
+.you-picked-label {
+  font-size: 0.78rem;
+  color: #e05050;
+  font-weight: 600;
+  margin-top: 4px;
+  padding-right: 3.5rem;
+}
 
 .bird-expand {
   margin-top: 14px;
@@ -124,8 +134,8 @@ h1 {
   border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-.question.correct { color: #4a90d9; font-weight: 700; font-size: 1.3rem; }
-.question.wrong   { color: #aaa;    font-weight: 700; font-size: 1.3rem; }
+.question.correct { color: #4caf50; font-weight: 700; font-size: 1.3rem; }
+.question.wrong   { color: #e05050; font-weight: 700; font-size: 1.3rem; }
 
 @keyframes suspense-pop {
   0%   { transform: scale(1);    opacity: 0.6; letter-spacing: 0.02em; }
