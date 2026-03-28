@@ -283,32 +283,20 @@ function nameToPrompt(name, difficulty) {
   const firstWord = words[0];
   const geoDesc   = GEO_HABITAT[firstWord] || '';
 
-  // ── Easy mode: whimsical literal interpretation ───────────────────────────
-  if (difficulty === 'easy') {
-    const literalType = LITERAL_TYPE[lastTwo] || LITERAL_TYPE[lastWord];
-    const literalPart = hyphenMatch ? (LITERAL_PART[hyphenMatch[2].toLowerCase()] || '') : '';
-    const colorName   = colorDesc || (hyphenMatch ? hyphenMatch[1] : '');
+  // Whimsical illustrated style for all difficulties
+  const literalType = LITERAL_TYPE[lastTwo] || LITERAL_TYPE[lastWord];
+  const literalPart = hyphenMatch ? (LITERAL_PART[hyphenMatch[2].toLowerCase()] || '') : '';
+  const colorName   = colorDesc || (hyphenMatch ? hyphenMatch[1] : '');
 
-    let twist = '';
-    if (literalType) twist = literalType;
-    else if (literalPart) twist = literalPart;
+  let twist = '';
+  if (literalType) twist = literalType;
+  else if (literalPart) twist = literalPart;
 
-    let desc = `A whimsical illustrated painting of a small colourful bird`;
-    if (colorName) desc += ` with ${colorName} colouring`;
-    if (twist) desc += `, ${twist}`;
-    desc += '. Charming storybook illustration style, vibrant colours, funny and endearing, white background or simple natural setting. No text or labels.';
-    return desc;
-  }
-
-  // ── Medium / Hard / Expert: realistic photo ───────────────────────────────
-  let desc = `A realistic wildlife photograph of a ${typeDesc}`;
-  if (colorDesc && partDesc) {
-    desc += `, with ${colorDesc} colouring ${partDesc}`;
-  } else if (colorDesc) {
-    desc += `, with ${colorDesc} plumage`;
-  }
-  if (geoDesc) desc += `, ${geoDesc}`;
-  desc += '. A pristine wilderness scene with no humans, no man-made objects, no cameras, no equipment, no technology, and no text. The bird fills the frame, sharp focus, natural daylight, blurred natural background.';
+  let desc = `A whimsical illustrated painting of a ${typeDesc}`;
+  if (colorName) desc += ` with ${colorName} colouring`;
+  if (twist) desc += `, ${twist}`;
+  if (geoDesc && !twist) desc += `, ${geoDesc}`;
+  desc += '. Charming storybook illustration style, vibrant colours, funny and endearing, simple natural setting. No text or labels.';
 
   return desc;
 }
