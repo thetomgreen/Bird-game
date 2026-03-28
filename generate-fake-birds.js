@@ -71,29 +71,50 @@ const ULTRA = {
   geo:      [...SNEAKY.geo, 'Papuan','Sulawesi','Philippine','Javan','Wallacean','Moluccan'],
 };
 
+// SILLY word lists — same as fake-names.js
+const SILLY = {
+  shortPre: ['Bumble','Grumble','Tumble','Stumble','Fumble','Mumble','Rumble',
+             'Scruffy','Muddle','Puddle','Waddle','Dawdle','Snuffle','Sniffle',
+             'Doodle','Noodle','Twiddle','Drizzle','Crumble','Hobble','Scuttle',
+             'Bobble','Goggle','Boggle','Warble','Throttle','Freckle','Wobble'],
+  shortSuf: ['bird','finch','wren','chat','lark','snipe','grebe','teal','swift',
+             'plover','bunting','thrush','martin','booby','stint','godwit','smew'],
+  medAdj:   ['Wobbly','Fluffy','Puffy','Fuzzy','Chubby','Grumpy','Sleepy',
+             'Bouncy','Bumbling','Shuffling','Waddling','Sneezy','Noodly',
+             'Lumpy','Sniffly','Pudgy','Teetering','Scruffy','Freckled','Ruffled'],
+  medNoun:  ['Doodle','Noodle','Rumble','Fumble','Tumble','Grumble','Wobble',
+             'Waddle','Hobble','Muddle','Gargle','Warble','Bobble','Goggle'],
+  medSuf:   ['bird','finch','wren','chat','lark','snipe','grebe','teal',
+             'plover','bunting','thrush','martin','warbler','stint'],
+  longScale:['Greater','Lesser','Common','Northern','Southern','Spotted','Magnificent'],
+  longAdj:  ['Wobbly','Fluffy','Chubby','Bouncy','Noodly','Lumpy','Sniffly',
+             'Pudgy','Teetering','Scruffy','Freckled','Ruffled','Dozy','Grumpy'],
+  longNoun: ['Doodle','Noodle','Wobble','Fumble','Grumble','Waddle','Hobble',
+             'Muddle','Gargle','Warble','Bobble','Twiddle','Scuttle','Mumble'],
+  longSuf:  ['bird','finch','wren','lark','chat','snipe','grebe','teal',
+             'plover','bunting','thrush','warbler','stint','godwit'],
+};
+
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 // ── Fake name generation (same logic as game) ─────────────────────────────────
 
 function generateFakeName(difficulty) {
   const len = Math.floor(Math.random() * 3);
-  if (difficulty === 'medium' || difficulty === 'hard') {
-    if (len === 0) {
-      return `${pick(PLAUSIBLE.longColor)}-${pick(PLAUSIBLE.longPart)} ${pick(PLAUSIBLE.longHab)}${pick(PLAUSIBLE.longType)}`;
-    } else if (len === 1) {
-      return `${pick(PLAUSIBLE.scale)} ${pick(PLAUSIBLE.longColor)}-${pick(PLAUSIBLE.longPart)} ${pick(PLAUSIBLE.longHab)}${pick(PLAUSIBLE.longType)}`;
-    } else {
-      return `${pick(PLAUSIBLE.scale)} ${pick(PLAUSIBLE.longHab)}${pick(PLAUSIBLE.longType)}`;
-    }
-  } else if (difficulty === 'expert') {
+  if (difficulty === 'easy') {
+    // SILLY names — same logic as fake-names.js easy mode
+    if (len === 0) return `${pick(SILLY.shortPre)}${pick(SILLY.shortSuf)}`;
+    if (len === 1) return `${pick(SILLY.medAdj)} ${pick(SILLY.medNoun)}${pick(SILLY.medSuf)}`;
+    return `${pick(SILLY.longScale)} ${pick(SILLY.longAdj)} ${pick(SILLY.longNoun)}${pick(SILLY.longSuf)}`;
+  } else if (difficulty === 'medium' || difficulty === 'hard') {
+    if (len === 0) return `${pick(PLAUSIBLE.longColor)}-${pick(PLAUSIBLE.longPart)} ${pick(PLAUSIBLE.longHab)}${pick(PLAUSIBLE.longType)}`;
+    if (len === 1) return `${pick(PLAUSIBLE.scale)} ${pick(PLAUSIBLE.longColor)}-${pick(PLAUSIBLE.longPart)} ${pick(PLAUSIBLE.longHab)}${pick(PLAUSIBLE.longType)}`;
+    return `${pick(PLAUSIBLE.scale)} ${pick(PLAUSIBLE.longHab)}${pick(PLAUSIBLE.longType)}`;
+  } else {
+    // expert
     if (len === 0) return `${pick(ULTRA.color)}-${pick(ULTRA.bodyPart)} ${pick(ULTRA.type)}`;
     if (len === 1) return `${pick(ULTRA.scale)} ${pick(ULTRA.color)}-${pick(ULTRA.bodyPart)} ${pick(ULTRA.type)}`;
     return `${pick(ULTRA.geo)} ${pick(ULTRA.color)}-${pick(ULTRA.bodyPart)} ${pick(ULTRA.type)}`;
-  } else {
-    // easy — sneaky-style names (silly names don't photograph well)
-    if (len === 0) return `${pick(SNEAKY.color)}-${pick(SNEAKY.bodyPart)} ${pick(SNEAKY.type)}`;
-    if (len === 1) return `${pick(SNEAKY.scale)} ${pick(SNEAKY.color)}-${pick(SNEAKY.bodyPart)} ${pick(SNEAKY.type)}`;
-    return `${pick(SNEAKY.geo)} ${pick(SNEAKY.color)}-${pick(SNEAKY.bodyPart)} ${pick(SNEAKY.type)}`;
   }
 }
 
@@ -259,38 +280,76 @@ const LITERAL_PART = {
   headed:     'with an enormous oversized head wobbling on a tiny body',
 };
 
+// Silly adjective → visual description for easy-mode prompts
+const SILLY_ADJ_MAP = {
+  wobbly:'wobbling unsteadily',fluffy:'extremely fluffy and puffed up',puffy:'puffed up like a balloon',
+  fuzzy:'covered in fuzzy soft feathers',chubby:'very chubby and round-bodied',grumpy:'with a very grumpy scowling expression',
+  sleepy:'with drooping eyes looking very sleepy',bouncy:'mid-bounce with springy legs',bumbling:'mid-stumble looking clumsy',
+  shuffling:'shuffling along awkwardly',waddling:'waddling like a penguin',sneezy:'mid-sneeze with eyes squeezed shut',
+  noodly:'with long floppy noodle-like limbs',lumpy:'with a hilariously lumpy bumpy body',sniffly:'with a runny beak and watery eyes',
+  pudgy:'extremely pudgy and rotund',teetering:'teetering on the edge of a branch',scruffy:'very scruffy with messy unkempt feathers',
+  freckled:'covered in big cartoon freckles',ruffled:'with wildly ruffled dishevelled feathers',
+  dozy:'half-asleep with sleepy drooping eyes',
+};
+
+// Silly noun → visual twist
+const SILLY_NOUN_MAP = {
+  doodle:'with squiggly doodle drawings covering its feathers',noodle:'with noodles tangled in its feathers',
+  rumble:'with cartoon rumble-lines and shaking',fumble:'dropping things and looking flustered',
+  tumble:'mid-tumble falling comically',grumble:'with a speech bubble full of grumpy squiggles',
+  wobble:'wobbling like jelly',waddle:'waddling with oversized feet',hobble:'hobbling with a tiny walking stick',
+  muddle:'surrounded by a cloud of confusion symbols',gargle:'mid-gargle with water droplets',
+  warble:'with a huge open mouth full of musical notes',bobble:'head bobbing up and down exaggeratedly',
+  goggle:'with enormous cartoon goggle eyes',twiddle:'twiddling its wingtip feathers nervously',
+  scuttle:'scuttling sideways like a crab',mumble:'with a barely-open beak mumbling',
+};
+
 function nameToPrompt(name, difficulty) {
   const lower = name.toLowerCase();
   const words = lower.replace(/-/g, ' ').split(' ');
 
-  // Extract colour + body part from hyphenated compound (e.g. "rufous-bellied")
+  // ── Easy mode: SILLY names need a special approach ────────────────────────
+  if (difficulty === 'easy') {
+    // Detect silly adjective (e.g. "Wobbly", "Fluffy") — usually second-to-last token
+    let sillyAdj = '';
+    for (const w of words) {
+      if (SILLY_ADJ_MAP[w]) { sillyAdj = SILLY_ADJ_MAP[w]; break; }
+    }
+    // Detect silly noun stem (e.g. "Doodle", "Noodle") — usually before the type suffix
+    let sillyNoun = '';
+    for (const w of words) {
+      if (SILLY_NOUN_MAP[w]) { sillyNoun = SILLY_NOUN_MAP[w]; break; }
+    }
+    // Bird type suffix (last word)
+    const lastWord = words[words.length - 1];
+    const birdType = TYPE_HABITAT[lastWord] || 'small round bird';
+
+    let desc = `A whimsical illustrated painting of a ${birdType}`;
+    if (sillyAdj) desc += `, ${sillyAdj}`;
+    if (sillyNoun) desc += `, ${sillyNoun}`;
+    desc += '. Charming storybook illustration style, vibrant colours, very funny and endearing, simple natural setting. No text or labels.';
+    return desc;
+  }
+
+  // ── Medium / Hard / Expert ─────────────────────────────────────────────────
   let colorDesc = '';
   let partDesc = '';
   const hyphenMatch = name.match(/(\w+)-(\w+)/);
   if (hyphenMatch) {
-    const col  = hyphenMatch[1].toLowerCase();
-    const part = hyphenMatch[2].toLowerCase();
-    colorDesc = COLOR_MAP[col] || col;
-    partDesc  = PART_MAP[part] || part;
+    colorDesc = COLOR_MAP[hyphenMatch[1].toLowerCase()] || hyphenMatch[1];
+    partDesc  = PART_MAP[hyphenMatch[2].toLowerCase()]  || hyphenMatch[2];
   }
 
-  // Extract bird type (last word or two for compound types)
   const lastWord = words[words.length - 1];
   const lastTwo  = words.slice(-2).join('-');
   const typeDesc = TYPE_HABITAT[lastTwo] || TYPE_HABITAT[lastWord] || 'perching bird';
+  const geoDesc  = GEO_HABITAT[words[0]] || '';
 
-  // Geographic/scale prefix
-  const firstWord = words[0];
-  const geoDesc   = GEO_HABITAT[firstWord] || '';
-
-  // Whimsical illustrated style for all difficulties
   const literalType = LITERAL_TYPE[lastTwo] || LITERAL_TYPE[lastWord];
   const literalPart = hyphenMatch ? (LITERAL_PART[hyphenMatch[2].toLowerCase()] || '') : '';
   const colorName   = colorDesc || (hyphenMatch ? hyphenMatch[1] : '');
 
-  let twist = '';
-  if (literalType) twist = literalType;
-  else if (literalPart) twist = literalPart;
+  let twist = literalType || literalPart || '';
 
   let desc = `A whimsical illustrated painting of a ${typeDesc}`;
   if (colorName) desc += ` with ${colorName} colouring`;

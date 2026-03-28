@@ -1,20 +1,421 @@
 // ── Fake bird images (pre-generated AI art) ─────────────────────────────────
 // Populated by generate-fake-birds.js — each entry is { name, file, difficulty }
-const FAKE_BIRD_IMAGES = [];
+// The game uses the pre-generated name so the image always matches.
+const FAKE_BIRD_IMAGES = [
+  {
+    "name": "Slate-rumped Vireo",
+    "file": "Slate-rumped_Vireo.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Black-winged Thornrunner",
+    "file": "Black-winged_Thornrunner.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Western Crestwren",
+    "file": "Western_Crestwren.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Scarlet-washed Nunlet",
+    "file": "Scarlet-washed_Nunlet.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Ochre-breasted Babbler",
+    "file": "Ochre-breasted_Babbler.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Golden-capped Cliffhawk",
+    "file": "Golden-capped_Cliffhawk.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Western Dusky-bellied Crownshrike",
+    "file": "Western_Dusky-bellied_Crownshrike.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Scarlet-shouldered Woodcreeper",
+    "file": "Scarlet-shouldered_Woodcreeper.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Scarlet-winged Sparrow",
+    "file": "Scarlet-winged_Sparrow.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Greater Sooty-faced Whistleshrike",
+    "file": "Greater_Sooty-faced_Whistleshrike.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Black-vented Belllark",
+    "file": "Black-vented_Belllark.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Sooty-throated Thornbill",
+    "file": "Sooty-throated_Thornbill.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Highland Indigo-headed Finch",
+    "file": "Highland_Indigo-headed_Finch.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Southern Buff-crowned Gorsewarbler",
+    "file": "Southern_Buff-crowned_Gorsewarbler.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Golden-bellied Crowndiver",
+    "file": "Golden-bellied_Crowndiver.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Dark-rumped Foliage-gleaner",
+    "file": "Dark-rumped_Foliage-gleaner.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Slender Red-billed Redstart",
+    "file": "Slender_Red-billed_Redstart.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Western Rufous-winged Gorsewren",
+    "file": "Western_Rufous-winged_Gorsewren.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Common Golden-breasted Sedgediver",
+    "file": "Common_Golden-breasted_Sedgediver.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Grey-faced Thornbill",
+    "file": "Grey-faced_Thornbill.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Cinnamon-throated Pitta",
+    "file": "Cinnamon-throated_Pitta.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Dusky-rumped Marshrunner",
+    "file": "Dusky-rumped_Marshrunner.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "White-fronted Thorndiver",
+    "file": "White-fronted_Thorndiver.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Scarlet-winged Bee-eater",
+    "file": "Scarlet-winged_Bee-eater.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Bornean Olive-fronted Nightjar",
+    "file": "Bornean_Olive-fronted_Nightjar.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Pale-winged Marshbird",
+    "file": "Pale-winged_Marshbird.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Southern Gorsewarbler",
+    "file": "Southern_Gorsewarbler.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Dark-cheeked Laughingthrush",
+    "file": "Dark-cheeked_Laughingthrush.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Island Dark-tailed Wren",
+    "file": "Island_Dark-tailed_Wren.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Rufous-billed Dalewarbler",
+    "file": "Rufous-billed_Dalewarbler.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Common Reedchat",
+    "file": "Common_Reedchat.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Grey-throated Wren-babbler",
+    "file": "Grey-throated_Wren-babbler.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Chestnut-collared Bunting",
+    "file": "Chestnut-collared_Bunting.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Eastern Thornwarbler",
+    "file": "Eastern_Thornwarbler.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Northern Dalefinch",
+    "file": "Northern_Dalefinch.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Little Rufous-collared Indigobird",
+    "file": "Little_Rufous-collared_Indigobird.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Coastal Grey-crowned Babbler",
+    "file": "Coastal_Grey-crowned_Babbler.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Barred-browed Gorsechat",
+    "file": "Barred-browed_Gorsechat.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Lesser Sedgehawk",
+    "file": "Lesser_Sedgehawk.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Little Scarlet-eared Indigobird",
+    "file": "Little_Scarlet-eared_Indigobird.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Golden-winged Chat",
+    "file": "Golden-winged_Chat.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Southern Barred-throated Mudshrike",
+    "file": "Southern_Barred-throated_Mudshrike.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Ash-bellied Thornhawk",
+    "file": "Ash-bellied_Thornhawk.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Indigo-crowned Nunlet",
+    "file": "Indigo-crowned_Nunlet.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Olive-bellied Barbet",
+    "file": "Olive-bellied_Barbet.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Tawny-tailed Crestfinch",
+    "file": "Tawny-tailed_Crestfinch.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Pale-throated Crestwarbler",
+    "file": "Pale-throated_Crestwarbler.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Amazonian Crimson-sided Cisticola",
+    "file": "Amazonian_Crimson-sided_Cisticola.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Little Blue-browed Grosbeak",
+    "file": "Little_Blue-browed_Grosbeak.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Buff-fronted Reedshrike",
+    "file": "Buff-fronted_Reedshrike.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "White-backed Bellwarbler",
+    "file": "White-backed_Bellwarbler.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Dark-washed Bee-eater",
+    "file": "Dark-washed_Bee-eater.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Chestnut-browed Flycatcher",
+    "file": "Chestnut-browed_Flycatcher.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Barred-capped Thornbird",
+    "file": "Barred-capped_Thornbird.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Dusky-crowned Mudwarbler",
+    "file": "Dusky-crowned_Mudwarbler.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Marbled-vented Sunbird",
+    "file": "Marbled-vented_Sunbird.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Slender Grey-throated Honeyeater",
+    "file": "Slender_Grey-throated_Honeyeater.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Northern Spotted-rumped Crestwren",
+    "file": "Northern_Spotted-rumped_Crestwren.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Southern Reedlark",
+    "file": "Southern_Reedlark.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Little Marbled-washed Bee-eater",
+    "file": "Little_Marbled-washed_Bee-eater.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Black-cheeked Babbler",
+    "file": "Black-cheeked_Babbler.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Ochre-rumped Gorsediver",
+    "file": "Ochre-rumped_Gorsediver.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Southern Crestrunner",
+    "file": "Southern_Crestrunner.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "American Scarlet-collared Spinetail",
+    "file": "American_Scarlet-collared_Spinetail.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Ochre-tailed Kingfisher",
+    "file": "Ochre-tailed_Kingfisher.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Barred-fronted Whistlelark",
+    "file": "Barred-fronted_Whistlelark.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Tawny-billed Daleshrike",
+    "file": "Tawny-billed_Daleshrike.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Pale Ochre-shouldered Nunlet",
+    "file": "Pale_Ochre-shouldered_Nunlet.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Pale-billed Heron",
+    "file": "Pale-billed_Heron.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Ash-breasted Sedgebird",
+    "file": "Ash-breasted_Sedgebird.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Spotted-naped Dustfinch",
+    "file": "Spotted-naped_Dustfinch.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Dusky-crowned Malimbe",
+    "file": "Dusky-crowned_Malimbe.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Northern Black-naped Trogon",
+    "file": "Northern_Black-naped_Trogon.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Sooty-naped Crestwarbler",
+    "file": "Sooty-naped_Crestwarbler.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Ochre-browed Thornbird",
+    "file": "Ochre-browed_Thornbird.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Eurasian Sooty-headed Bush-warbler",
+    "file": "Eurasian_Sooty-headed_Bush-warbler.png",
+    "difficulty": "expert"
+  },
+  {
+    "name": "Desert Ochre-naped Hawk",
+    "file": "Desert_Ochre-naped_Hawk.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Black-rumped Sedgewarbler",
+    "file": "Black-rumped_Sedgewarbler.png",
+    "difficulty": "medium"
+  },
+  {
+    "name": "Ash-crowned Gorsebird",
+    "file": "Ash-crowned_Gorsebird.png",
+    "difficulty": "hard"
+  },
+  {
+    "name": "Little Dusky-rumped Pytilia",
+    "file": "Little_Dusky-rumped_Pytilia.png",
+    "difficulty": "expert"
+  }
+];
 
-// Pool management for fake bird images
+// Pool management for fake names (mirrors real-bird pool shuffling)
 let fakeImagePool = { easy: [], medium: [], hard: [], expert: [] };
 
-function pickFakeImage() {
+function pickFakeEntry() {
   if (!FAKE_BIRD_IMAGES.length) return null;
   const style = getStyle();
-  // Prefer matching difficulty; fall back to any
   const matching = FAKE_BIRD_IMAGES.filter(e => e.difficulty === style);
   const pool = matching.length ? matching : FAKE_BIRD_IMAGES;
   if (!fakeImagePool[style] || fakeImagePool[style].length === 0) {
     fakeImagePool[style] = shuffle([...Array(pool.length).keys()]);
   }
-  return pool[fakeImagePool[style].pop()].file;
+  return pool[fakeImagePool[style].pop()];
 }
 
 // ── Photo fetching ───────────────────────────────────────────────────────────
@@ -87,10 +488,11 @@ function startRound() {
     `Question ${questionCount + 1} of ${ROUNDS_PER_GAME}`;
 
   const [bird1, bird2] = pickTwoBirds();
+  const fakeEntry = pickFakeEntry();
   currentRound = {
     real: [bird1, bird2],
-    fake: generateFakeName(),
-    fakeImage: pickFakeImage(),
+    fake: fakeEntry ? fakeEntry.name : generateFakeName(),
+    fakeImage: fakeEntry ? fakeEntry.file : null,
   };
 
   // Kick off photo fetches in background while user is thinking
