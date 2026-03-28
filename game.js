@@ -5,7 +5,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Slate-rumped Vireo",
     "file": "Slate-rumped_Vireo.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Black-winged Thornrunner",
@@ -25,7 +25,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Ochre-breasted Babbler",
     "file": "Ochre-breasted_Babbler.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Golden-capped Cliffhawk",
@@ -45,7 +45,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Scarlet-winged Sparrow",
     "file": "Scarlet-winged_Sparrow.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Greater Sooty-faced Whistleshrike",
@@ -65,7 +65,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Highland Indigo-headed Finch",
     "file": "Highland_Indigo-headed_Finch.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Southern Buff-crowned Gorsewarbler",
@@ -85,7 +85,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Slender Red-billed Redstart",
     "file": "Slender_Red-billed_Redstart.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Western Rufous-winged Gorsewren",
@@ -105,7 +105,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Cinnamon-throated Pitta",
     "file": "Cinnamon-throated_Pitta.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Dusky-rumped Marshrunner",
@@ -125,7 +125,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Bornean Olive-fronted Nightjar",
     "file": "Bornean_Olive-fronted_Nightjar.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Pale-winged Marshbird",
@@ -145,7 +145,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Island Dark-tailed Wren",
     "file": "Island_Dark-tailed_Wren.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Rufous-billed Dalewarbler",
@@ -165,7 +165,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Chestnut-collared Bunting",
     "file": "Chestnut-collared_Bunting.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Eastern Thornwarbler",
@@ -185,7 +185,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Coastal Grey-crowned Babbler",
     "file": "Coastal_Grey-crowned_Babbler.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Barred-browed Gorsechat",
@@ -205,7 +205,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Golden-winged Chat",
     "file": "Golden-winged_Chat.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Southern Barred-throated Mudshrike",
@@ -225,7 +225,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Olive-bellied Barbet",
     "file": "Olive-bellied_Barbet.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Tawny-tailed Crestfinch",
@@ -245,7 +245,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Little Blue-browed Grosbeak",
     "file": "Little_Blue-browed_Grosbeak.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Buff-fronted Reedshrike",
@@ -265,7 +265,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Chestnut-browed Flycatcher",
     "file": "Chestnut-browed_Flycatcher.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Barred-capped Thornbird",
@@ -285,7 +285,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Slender Grey-throated Honeyeater",
     "file": "Slender_Grey-throated_Honeyeater.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Northern Spotted-rumped Crestwren",
@@ -305,7 +305,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Black-cheeked Babbler",
     "file": "Black-cheeked_Babbler.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Ochre-rumped Gorsediver",
@@ -325,7 +325,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Ochre-tailed Kingfisher",
     "file": "Ochre-tailed_Kingfisher.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Barred-fronted Whistlelark",
@@ -345,7 +345,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Pale-billed Heron",
     "file": "Pale-billed_Heron.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Ash-breasted Sedgebird",
@@ -365,7 +365,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Northern Black-naped Trogon",
     "file": "Northern_Black-naped_Trogon.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Sooty-naped Crestwarbler",
@@ -385,7 +385,7 @@ const FAKE_BIRD_IMAGES = [
   {
     "name": "Desert Ochre-naped Hawk",
     "file": "Desert_Ochre-naped_Hawk.png",
-    "difficulty": "easy"
+    "difficulty": "medium"
   },
   {
     "name": "Black-rumped Sedgewarbler",
