@@ -1,33 +1,26 @@
 #!/usr/bin/env node
-// generate-fake-birds.js — generate AI images for fake bird names using OpenAI DALL-E
+// generate-fake-birds.js — generate AI images for fake bird names using Google Imagen 3
 //
 // Usage:
-//   OPENAI_API_KEY=sk-... node generate-fake-birds.js
+//   GOOGLE_API_KEY=AIza... node generate-fake-birds.js [count]
 //
-// How it works:
-//   1. Generates 100 fake bird names using the same word lists as the game
-//   2. Builds a visual prompt for each name (extracting colour, body part, habitat, type)
-//   3. Generates an image per name and saves to fake-bird-images/
-//   4. Updates FAKE_BIRD_IMAGES in game.js so the game uses these name+image pairs
-//      as its pool of fake birds (guaranteeing the image always matches the name)
-//
-// Cost: ~$4 for 100 images at DALL-E 3 standard quality ($0.04/image).
-// Resumes automatically if interrupted (skips already-downloaded files).
+// Get a free API key at https://aistudio.google.com/app/apikey
+// Resumes automatically if interrupted.
 
 const fs    = require('fs');
 const https = require('https');
 const path  = require('path');
 
-const API_KEY   = process.env.OPENAI_API_KEY;
+const API_KEY   = process.env.GOOGLE_API_KEY;
 const OUT_DIR   = path.join(__dirname, 'fake-bird-images');
 const GAME_FILE = path.join(__dirname, 'game.js');
 const COUNT_ARG = parseInt(process.argv[2] || '100', 10);
 const TOTAL     = isNaN(COUNT_ARG) ? 100 : COUNT_ARG;
-const DELAY_MS  = 12000; // 12s gap — DALL-E 3 rate limit ~5 req/min
+const DELAY_MS  = 6000; // 6s gap between requests
 
 if (!API_KEY) {
-  console.error('Error: OPENAI_API_KEY not set.');
-  console.error('  OPENAI_API_KEY=sk-... node generate-fake-birds.js');
+  console.error('Error: GOOGLE_API_KEY not set.');
+  console.error('  GOOGLE_API_KEY=AIza... node generate-fake-birds.js');
   process.exit(1);
 }
 
@@ -263,24 +256,20 @@ function nameToPrompt(name) {
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-async function generateImage(prompt) {
+// Imagen 3 via Google AI Studio — returns raw PNG bytes as base64
+async function generateImage(prompt, filepath) {
   const body = JSON.stringify({
-    model: 'dall-e-3',
-    prompt,
-    n: 1,
-    size: '1024x1024',
-    quality: 'standard',
-    response_format: 'url',
+    instances: [{ prompt }],
+    parameters: { sampleCount: 1, aspectRatio: '1:1' },
   });
 
   return new Promise((resolve, reject) => {
     const req = https.request({
-      hostname: 'api.openai.com',
-      path: '/v1/images/generations',
+      hostname: 'generativelanguage.googleapis.com',
+      path: `/v1beta/models/imagen-3.0-generate-002:predict?key=${API_KEY}`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`,
         'Content-Length': Buffer.byteLength(body),
       },
     }, res => {
@@ -289,8 +278,11 @@ async function generateImage(prompt) {
       res.on('end', () => {
         try {
           const json = JSON.parse(data);
-          if (json.error) { reject(new Error(json.error.message)); return; }
-          resolve(json.data[0].url);
+          if (json.error) { reject(new Error(json.error.message || JSON.stringify(json.error))); return; }
+          const b64 = json.predictions?.[0]?.bytesBase64Encoded;
+          if (!b64) { reject(new Error('No image in response: ' + data.slice(0, 200))); return; }
+          fs.writeFileSync(filepath, Buffer.from(b64, 'base64'));
+          resolve();
         } catch (e) { reject(e); }
       });
     });
@@ -298,22 +290,6 @@ async function generateImage(prompt) {
     req.setTimeout(60000, () => { req.destroy(); reject(new Error('timeout')); });
     req.write(body);
     req.end();
-  });
-}
-
-async function downloadImage(url, filepath) {
-  return new Promise((resolve, reject) => {
-    const follow = (u) => {
-      https.get(u, res => {
-        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-          follow(res.headers.location); return;
-        }
-        const chunks = [];
-        res.on('data', chunk => chunks.push(chunk));
-        res.on('end', () => { fs.writeFileSync(filepath, Buffer.concat(chunks)); resolve(); });
-      }).on('error', reject);
-    };
-    follow(url);
   });
 }
 
@@ -428,8 +404,7 @@ async function main() {
     let success = false;
     while (retries > 0) {
       try {
-        const url = await generateImage(prompt);
-        await downloadImage(url, filepath);
+        await generateImage(prompt, filepath);
         console.log('✓');
         entries.push({ name, file, difficulty: diff });
         writePreview(entries);
