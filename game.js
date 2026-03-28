@@ -411,11 +411,12 @@ function pickFakeEntry() {
   if (!FAKE_BIRD_IMAGES.length) return null;
   const style = getStyle();
   const matching = FAKE_BIRD_IMAGES.filter(e => e.difficulty === style);
-  const pool = matching.length ? matching : FAKE_BIRD_IMAGES;
+  // Don't fall back to other difficulties — return null and let generateFakeName() handle it
+  if (!matching.length) return null;
   if (!fakeImagePool[style] || fakeImagePool[style].length === 0) {
-    fakeImagePool[style] = shuffle([...Array(pool.length).keys()]);
+    fakeImagePool[style] = shuffle([...Array(matching.length).keys()]);
   }
-  return pool[fakeImagePool[style].pop()];
+  return matching[fakeImagePool[style].pop()];
 }
 
 // ── Photo fetching ───────────────────────────────────────────────────────────
