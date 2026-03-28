@@ -256,17 +256,17 @@ function nameToPrompt(name) {
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-// Imagen 4 via Google AI Studio
+// nano-banana-pro-preview via Google AI Studio
 async function generateImage(prompt, filepath) {
   const body = JSON.stringify({
-    instances: [{ prompt }],
-    parameters: { sampleCount: 1 },
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: { responseModalities: ['IMAGE', 'TEXT'] },
   });
 
   return new Promise((resolve, reject) => {
     const req = https.request({
       hostname: 'generativelanguage.googleapis.com',
-      path: `/v1beta/models/imagen-4.0-generate-001:predict?key=${API_KEY}`,
+      path: `/v1beta/models/nano-banana-pro-preview:generateContent?key=${API_KEY}`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -279,7 +279,10 @@ async function generateImage(prompt, filepath) {
         try {
           const json = JSON.parse(data);
           if (json.error) { reject(new Error(json.error.message || JSON.stringify(json.error))); return; }
-          const b64 = json.predictions?.[0]?.bytesBase64Encoded;
+          // Try Gemini inline image format first, then Imagen predictions format
+          const parts = json.candidates?.[0]?.content?.parts || [];
+          const imgPart = parts.find(p => p.inlineData?.mimeType?.startsWith('image/'));
+          const b64 = imgPart?.inlineData?.data || json.predictions?.[0]?.bytesBase64Encoded;
           if (!b64) { reject(new Error('No image in response: ' + data.slice(0, 300))); return; }
           fs.writeFileSync(filepath, Buffer.from(b64, 'base64'));
           resolve();
