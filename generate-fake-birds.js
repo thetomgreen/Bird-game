@@ -16,6 +16,7 @@ const OUT_DIR   = path.join(__dirname, 'fake-bird-images');
 const GAME_FILE = path.join(__dirname, 'game.js');
 const COUNT_ARG = parseInt(process.argv[2] || '100', 10);
 const TOTAL     = isNaN(COUNT_ARG) ? 100 : COUNT_ARG;
+const FORCE_DIFF = process.argv[3] || null; // e.g. "easy" to force all images to one difficulty
 const DELAY_MS  = 6000; // 6s gap between requests
 
 if (!API_KEY) {
@@ -213,7 +214,52 @@ const GEO_HABITAT = {
   wallacean:'in Wallacean island forest',moluccan:'in Moluccan rainforest',
 };
 
-function nameToPrompt(name) {
+// Literal twists for easy difficulty — interpret the type name as a real-world object
+const LITERAL_TYPE = {
+  trumpeter:    'with a full-sized shiny brass trumpet musical instrument growing directly out of its beak',
+  kingfisher:   'wearing a tiny glittering royal crown on its head and clutching a small fishing rod in its wing',
+  flycatcher:   'with its beak wide open catching a large cartoon fly mid-air, more flies buzzing around',
+  warbler:      'with a speech bubble full of musical notes coming from its open beak as it sings loudly',
+  woodpecker:   'hammering a wooden plank with a little carpenter\'s hard-hat on its head',
+  'bee-eater':  'with a fat cartoon bee comically sticking halfway out of its beak',
+  sunbird:      'glowing with golden sun rays and sparkles radiating from its whole body like a tiny sun',
+  shrike:       'wearing a tiny butcher\'s apron and perched next to a miniature butcher\'s hook',
+  nightjar:     'sitting next to a glass jar labelled "NIGHT" filled with swirling darkness and stars',
+  drongo:       'looking hilariously dazed with cartoon stars and question marks orbiting its head',
+  puffbird:     'puffed up to an absurd balloon-like spherical size, almost perfectly round',
+  spinetail:    'with a long spiny cactus spine growing comically from its tail',
+  thornbill:    'with a large rose thorn stuck through its bill like a sword',
+  broadbill:    'with a comically enormous wide flat bill like a cartoon duck',
+  hawfinch:     'with the fierce scowling face of a tiny hawk painted on the body of a plump finch',
+  antpitta:     'standing on an anthill with cartoon ants marching in a line toward it',
+  antshrike:    'wearing a tiny warrior helmet and brandishing a miniature shrike-sword made of twigs',
+  pipit:        'surrounded by scattered apple pips and cherry pips on the ground',
+  nuthatch:     'hanging upside-down from a branch wearing a tiny hard-hat, holding a miniature nutcracker',
+  trogon:       'with an actual decorative Christmas tree bauble (trogon rhymes) hanging from a branch beside it',
+  babbler:      'with a huge open mouth and an exaggerated speech bubble full of scribble lines as if chattering endlessly',
+  laughingthrush: 'doubled over in exaggerated cartoon laughter, tears streaming from its eyes',
+  firefinch:    'with tiny cartoon flames flickering from its tail feathers',
+  flowerpecker: 'aggressively pecking at a large cheerful cartoon flower',
+  swallow:      'with an exaggerated huge gulp in its throat as if it just swallowed something very large',
+  swift:        'moving so fast it has a jet-engine trail behind it and a speed blur',
+  runner:       'wearing tiny running shoes on its feet, frozen mid-sprint',
+  diver:        'wearing tiny swimming goggles and a snorkel',
+};
+
+// Literal colour/body-part overrides for easy mode
+const LITERAL_PART = {
+  crowned:    'wearing a large jewelled royal crown',
+  bellied:    'with an enormous rounded pot-belly sticking out',
+  tailed:     'with a comically long tail dragging on the ground behind it',
+  billed:     'with an absurdly large exaggerated bill',
+  faced:      'with a cartoon painted face like clown makeup',
+  backed:     'carrying a tiny backpack on its back',
+  winged:     'with enormous oversized wings spread dramatically wide',
+  footed:     'standing on comically large cartoon feet',
+  headed:     'with an enormous oversized head wobbling on a tiny body',
+};
+
+function nameToPrompt(name, difficulty) {
   const lower = name.toLowerCase();
   const words = lower.replace(/-/g, ' ').split(' ');
 
@@ -222,24 +268,39 @@ function nameToPrompt(name) {
   let partDesc = '';
   const hyphenMatch = name.match(/(\w+)-(\w+)/);
   if (hyphenMatch) {
-    const col = hyphenMatch[1].toLowerCase();
+    const col  = hyphenMatch[1].toLowerCase();
     const part = hyphenMatch[2].toLowerCase();
     colorDesc = COLOR_MAP[col] || col;
-    partDesc = PART_MAP[part] || part;
+    partDesc  = PART_MAP[part] || part;
   }
 
   // Extract bird type (last word or two for compound types)
-  let typeDesc = '';
   const lastWord = words[words.length - 1];
   const lastTwo  = words.slice(-2).join('-');
-  typeDesc = TYPE_HABITAT[lastTwo] || TYPE_HABITAT[lastWord] || 'perching bird';
+  const typeDesc = TYPE_HABITAT[lastTwo] || TYPE_HABITAT[lastWord] || 'perching bird';
 
   // Geographic/scale prefix
-  let geoDesc = '';
   const firstWord = words[0];
-  geoDesc = GEO_HABITAT[firstWord] || '';
+  const geoDesc   = GEO_HABITAT[firstWord] || '';
 
-  // Build the prompt
+  // ── Easy mode: whimsical literal interpretation ───────────────────────────
+  if (difficulty === 'easy') {
+    const literalType = LITERAL_TYPE[lastTwo] || LITERAL_TYPE[lastWord];
+    const literalPart = hyphenMatch ? (LITERAL_PART[hyphenMatch[2].toLowerCase()] || '') : '';
+    const colorName   = colorDesc || (hyphenMatch ? hyphenMatch[1] : '');
+
+    let twist = '';
+    if (literalType) twist = literalType;
+    else if (literalPart) twist = literalPart;
+
+    let desc = `A whimsical illustrated painting of a small colourful bird`;
+    if (colorName) desc += ` with ${colorName} colouring`;
+    if (twist) desc += `, ${twist}`;
+    desc += '. Charming storybook illustration style, vibrant colours, funny and endearing, white background or simple natural setting. No text or labels.';
+    return desc;
+  }
+
+  // ── Medium / Hard / Expert: realistic photo ───────────────────────────────
   let desc = `A realistic wildlife photograph of a ${typeDesc}`;
   if (colorDesc && partDesc) {
     desc += `, with ${colorDesc} colouring ${partDesc}`;
@@ -381,7 +442,7 @@ async function main() {
 
   let i = existing.length;
   while (entries.length < TOTAL) {
-    const diff = difficulties[i % difficulties.length];
+    const diff = FORCE_DIFF || difficulties[i % difficulties.length];
     let name;
     let attempts = 0;
     do {
@@ -400,7 +461,7 @@ async function main() {
       continue;
     }
 
-    const prompt = nameToPrompt(name);
+    const prompt = nameToPrompt(name, diff);
     process.stdout.write(`[${entries.length + 1}/${TOTAL}] ${name}\n  → ${prompt}\n  Generating... `);
 
     let retries = 3;
