@@ -1,12 +1,11 @@
 // ── Fake bird images (pre-generated AI art) ─────────────────────────────────
 // Populated by generate-fake-birds.js — each entry is { name, file, difficulty }
-// The game picks fake names from this pool so the image always matches the name.
 const FAKE_BIRD_IMAGES = [];
 
-// Pool management for fake names (mirrors the real-bird pool shuffling)
+// Pool management for fake bird images
 let fakeImagePool = { easy: [], medium: [], hard: [], expert: [] };
 
-function pickFakeEntry() {
+function pickFakeImage() {
   if (!FAKE_BIRD_IMAGES.length) return null;
   const style = getStyle();
   // Prefer matching difficulty; fall back to any
@@ -15,7 +14,7 @@ function pickFakeEntry() {
   if (!fakeImagePool[style] || fakeImagePool[style].length === 0) {
     fakeImagePool[style] = shuffle([...Array(pool.length).keys()]);
   }
-  return pool[fakeImagePool[style].pop()];
+  return pool[fakeImagePool[style].pop()].file;
 }
 
 // ── Photo fetching ───────────────────────────────────────────────────────────
@@ -88,11 +87,10 @@ function startRound() {
     `Question ${questionCount + 1} of ${ROUNDS_PER_GAME}`;
 
   const [bird1, bird2] = pickTwoBirds();
-  const fakeEntry = pickFakeEntry();
   currentRound = {
     real: [bird1, bird2],
-    fake: fakeEntry ? fakeEntry.name : generateFakeName(),
-    fakeImage: fakeEntry ? fakeEntry.file : null,
+    fake: generateFakeName(),
+    fakeImage: pickFakeImage(),
   };
 
   // Kick off photo fetches in background while user is thinking
