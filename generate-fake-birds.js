@@ -256,17 +256,17 @@ function nameToPrompt(name) {
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-// Gemini image generation via Google AI Studio
+// Imagen 4 via Google AI Studio
 async function generateImage(prompt, filepath) {
   const body = JSON.stringify({
-    contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: { responseModalities: ['IMAGE', 'TEXT'] },
+    instances: [{ prompt }],
+    parameters: { sampleCount: 1 },
   });
 
   return new Promise((resolve, reject) => {
     const req = https.request({
       hostname: 'generativelanguage.googleapis.com',
-      path: `/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${API_KEY}`,
+      path: `/v1beta/models/imagen-4.0-generate-001:predict?key=${API_KEY}`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -279,10 +279,9 @@ async function generateImage(prompt, filepath) {
         try {
           const json = JSON.parse(data);
           if (json.error) { reject(new Error(json.error.message || JSON.stringify(json.error))); return; }
-          const parts = json.candidates?.[0]?.content?.parts || [];
-          const imgPart = parts.find(p => p.inlineData?.mimeType?.startsWith('image/'));
-          if (!imgPart) { reject(new Error('No image in response: ' + data.slice(0, 300))); return; }
-          fs.writeFileSync(filepath, Buffer.from(imgPart.inlineData.data, 'base64'));
+          const b64 = json.predictions?.[0]?.bytesBase64Encoded;
+          if (!b64) { reject(new Error('No image in response: ' + data.slice(0, 300))); return; }
+          fs.writeFileSync(filepath, Buffer.from(b64, 'base64'));
           resolve();
         } catch (e) { reject(e); }
       });
