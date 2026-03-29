@@ -285,12 +285,9 @@ h1 {
   background: #2a3d2a;
   border: 2px solid #3d5a3d;
   border-radius: 14px;
-  padding: 14px 18px;
+  padding: 16px 20px;
   cursor: pointer;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+  text-align: center;
   transition: all 0.15s ease;
   -webkit-tap-highlight-color: transparent;
   width: 100%;
@@ -348,16 +345,18 @@ h1 {
 
 .adjust-btn {
   background: transparent;
-  border: none;
-  color: #666;
-  font-size: 0.78rem;
+  border: 1px solid #3d5a3d;
+  border-radius: 8px;
+  color: #999;
+  font-size: 0.82rem;
+  font-weight: 600;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 6px 14px;
   -webkit-tap-highlight-color: transparent;
-  transition: color 0.15s;
+  transition: all 0.15s;
 }
 
-.adjust-btn:hover, .adjust-btn:active { color: #999; }
+.adjust-btn:hover, .adjust-btn:active { color: #ccc; border-color: #5a7a5a; }
 
 /* ── End screen auto-ready message ─────────────────────────────────────────── */
 .auto-ready-msg {
