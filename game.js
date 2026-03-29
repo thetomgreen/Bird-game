@@ -585,8 +585,13 @@ const SUPABASE_KEY = 'sb_publishable_k8VKAOPtMFSU-dOVgRrnvg_-H2gexf0';
 const sessionId = crypto.randomUUID();
 let questionStartTime = null;
 
+if (new URLSearchParams(location.search).get('admin') === '1') {
+  localStorage.setItem('rbof_admin', '1');
+}
+
 function logAnswer(pickedFake, pickedName) {
   if (SUPABASE_URL === 'YOUR_SUPABASE_URL') return; // not yet configured
+  if (localStorage.getItem('rbof_admin')) return;   // owner exclusion
   const payload = {
     session_id: sessionId,
     question_number: questionCount + 1,
