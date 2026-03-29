@@ -5,13 +5,22 @@
 
 const https = require('https');
 
-function get(url) {
+function get(url, depth = 0) {
+  if (depth > 5) return Promise.reject(new Error('too many redirects'));
   return new Promise((resolve, reject) => {
     const req = https.get(url, { headers: { 'User-Agent': 'BirdGame/1.0' } }, res => {
+      console.log(`  HTTP ${res.statusCode} → ${url}`);
+      if ((res.statusCode === 301 || res.statusCode === 302) && res.headers.location) {
+        const next = res.headers.location.startsWith('http')
+          ? res.headers.location
+          : new URL(res.headers.location, url).href;
+        res.resume();
+        resolve(get(next, depth + 1));
+        return;
+      }
       let data = '';
       res.on('data', c => data += c);
       res.on('end', () => {
-        console.log('HTTP status:', res.statusCode);
         try { resolve(JSON.parse(data)); }
         catch (e) { console.log('Raw response:', data.slice(0, 500)); reject(e); }
       });
