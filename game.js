@@ -577,6 +577,41 @@ const MEDIUM_BIRDS   = BIRDS.filter(b => b.photo && b.fame >= 3 && b.fame <= 4);
 const OBSCURE_BIRDS  = BIRDS.filter(b => b.photo && b.fame <= 2);
 const HARD_BIRDS_P   = HARD_BIRDS.filter(b => b.photo);
 
+// ── Analytics ────────────────────────────────────────────────────────────────
+// Set these after creating a Supabase project (see supabase-schema.sql)
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+const sessionId = crypto.randomUUID();
+let questionStartTime = null;
+
+function logAnswer(pickedFake, pickedName) {
+  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') return; // not yet configured
+  const payload = {
+    session_id: sessionId,
+    question_number: questionCount + 1,
+    difficulty: getStyle(),
+    selected_difficulty: selectedDifficulty,
+    real_bird_1: currentRound.real[0].name,
+    real_bird_2: currentRound.real[1].name,
+    fake_bird: currentRound.fake,
+    picked_name: pickedName,
+    correct: pickedFake,
+    response_time_ms: questionStartTime ? Date.now() - questionStartTime : null,
+    mobile: /Mobi|Android/i.test(navigator.userAgent),
+  };
+  fetch(`${SUPABASE_URL}/rest/v1/game_events`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Prefer': 'return=minimal',
+    },
+    body: JSON.stringify(payload),
+  }).catch(() => {}); // fire and forget
+}
+
 // ── Game state ───────────────────────────────────────────────────────────────
 const ROUNDS_PER_GAME = 6;
 let questionCount = 0, gameScore = 0;
@@ -619,6 +654,7 @@ function pickTwoBirds() {
 
 function startRound() {
   answered = false;
+  questionStartTime = Date.now();
   updateAdjustButtons();
 
   document.getElementById('question-progress').textContent =
@@ -663,6 +699,7 @@ function startRound() {
 async function handleGuess(pickedFake, pickedName) {
   if (answered) return;
   answered = true;
+  logAnswer(pickedFake, pickedName);
 
   if (selectedDifficulty === 'auto') updateAdaptiveDifficulty(pickedFake);
 

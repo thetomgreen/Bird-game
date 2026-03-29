@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Real Bird or Fake — Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #1a1f1a;
+    --surface: #232923;
+    --border: #2e382e;
+    --text: #d8e8d8;
+    --muted: #7a907a;
+    --green: #5aab5a;
+    --red: #d05050;
+    --amber: #d4a030;
+    --blue: #4a90a4;
+    --purple: #8060b0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; font-size: 15px; }
+
+  header { padding: 24px 32px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 16px; }
+  header h1 { font-size: 1.4rem; font-weight: 600; color: var(--text); }
+  header h1 span { color: var(--green); }
+  #last-updated { color: var(--muted); font-size: 0.85rem; margin-left: auto; }
+  #status { color: var(--muted); font-size: 0.85rem; }
+
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  /* Config warning */
+  #config-warning { background: #3a2a10; border: 1px solid #6a4a20; border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; color: #e0a040; display: none; }
+  #config-warning code { background: #2a1a08; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+
+  /* Stat cards */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+  .stat-card .label { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .stat-card .value { font-size: 2rem; font-weight: 700; line-height: 1; }
+  .stat-card .sub { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+
+  /* Charts */
+  .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .charts-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .chart-card h2 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 16px; }
+  .chart-wrap { position: relative; }
+
+  /* Tables */
+  .tables-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .table-card h2 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th { color: var(--muted); font-weight: 500; text-align: left; padding: 0 8px 8px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  td { padding: 7px 8px 7px 0; border-bottom: 1px solid #1e261e; }
+  tr:last-child td { border-bottom: none; }
+  .pct-cell { text-align: right; font-variant-numeric: tabular-nums; }
+  .bar-bg { background: #1e261e; border-radius: 3px; height: 6px; margin-top: 4px; }
+  .bar-fill { height: 6px; border-radius: 3px; }
+  .n-cell { color: var(--muted); font-size: 0.8rem; text-align: right; }
+
+  /* Difficulty pill colors */
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+  .pill-easy   { background: #1a3a1a; color: #5aab5a; }
+  .pill-medium { background: #2a2a10; color: #c8a030; }
+  .pill-hard   { background: #2a1a10; color: #c05030; }
+  .pill-expert { background: #20102a; color: #9060c0; }
+  .pill-auto   { background: #10202a; color: #4a90a4; }
+
+  @media (max-width: 700px) {
+    .charts-row, .charts-row2, .tables-row { grid-template-columns: 1fr; }
+    header { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🐦 Real Bird or Fake — <span>Dashboard</span></h1>
+  <span id="status">Loading…</span>
+  <span id="last-updated"></span>
+</header>
+
+<main>
+  <div id="config-warning">
+    <strong>Not connected:</strong> Open <code>game.js</code> and set <code>SUPABASE_URL</code> and <code>SUPABASE_KEY</code>,
+    then run <code>supabase-schema.sql</code> in your Supabase project. Once configured, data will appear here.
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="label">Sessions</div><div class="value" id="s-sessions">—</div></div>
+    <div class="stat-card"><div class="label">Questions</div><div class="value" id="s-questions">—</div></div>
+    <div class="stat-card"><div class="label">Correct</div><div class="value" id="s-correct">—</div><div class="sub">overall</div></div>
+    <div class="stat-card"><div class="label">Avg response</div><div class="value" id="s-rt">—</div><div class="sub">seconds</div></div>
+    <div class="stat-card"><div class="label">Mobile</div><div class="value" id="s-mobile">—</div><div class="sub">of sessions</div></div>
+    <div class="stat-card"><div class="label">Today</div><div class="value" id="s-today">—</div><div class="sub">questions</div></div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <h2>Activity — questions per day (last 30 days)</h2>
+      <div class="chart-wrap"><canvas id="chart-activity" height="120"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h2>Mode chosen</h2>
+      <div class="chart-wrap"><canvas id="chart-modes" height="120"></canvas></div>
+    </div>
+  </div>
+
+  <div class="charts-row2">
+    <div class="chart-card">
+      <h2>Correct % by difficulty</h2>
+      <div class="chart-wrap"><canvas id="chart-diff-correct" height="140"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h2>Avg response time by difficulty (s)</h2>
+      <div class="chart-wrap"><canvas id="chart-diff-rt" height="140"></canvas></div>
+    </div>
+  </div>
+
+  <div class="tables-row">
+    <div class="table-card">
+      <h2>Most confusing real birds <span style="color:var(--muted);font-size:0.8em;font-weight:400">(mistaken for fake)</span></h2>
+      <table>
+        <thead><tr><th>Bird</th><th class="n-cell">Shown</th><th class="pct-cell">Fooled</th></tr></thead>
+        <tbody id="t-confused"></tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <h2>Most convincing fakes <span style="color:var(--muted);font-size:0.8em;font-weight:400">(escaped detection)</span></h2>
+      <table>
+        <thead><tr><th>Fake name</th><th class="n-cell">Shown</th><th class="pct-cell">Fooled</th></tr></thead>
+        <tbody id="t-fakes"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="tables-row">
+    <div class="table-card">
+      <h2>Sessions over time <span style="color:var(--muted);font-size:0.8em;font-weight:400">(last 14 days)</span></h2>
+      <table>
+        <thead><tr><th>Date</th><th class="n-cell">Sessions</th><th class="n-cell">Questions</th><th class="pct-cell">Correct</th></tr></thead>
+        <tbody id="t-daily"></tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <h2>Difficulty breakdown</h2>
+      <table>
+        <thead><tr><th>Difficulty</th><th class="n-cell">Questions</th><th class="pct-cell">Correct</th><th class="n-cell">Avg (s)</th></tr></thead>
+        <tbody id="t-diff"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+// ── Config ───────────────────────────────────────────────────────────────────
+// These must match game.js
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+// ── Fetch ─────────────────────────────────────────────────────────────────────
+async function fetchEvents() {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/game_events?select=session_id,question_number,difficulty,selected_difficulty,real_bird_1,real_bird_2,fake_bird,picked_name,correct,response_time_ms,mobile,created_at&order=created_at.desc&limit=10000`,
+    { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+  );
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+// ── Chart helpers ─────────────────────────────────────────────────────────────
+const CHART_DEFAULTS = {
+  plugins: { legend: { display: false } },
+  scales: {
+    x: { ticks: { color: '#7a907a', font: { size: 11 } }, grid: { color: '#2e382e' } },
+    y: { ticks: { color: '#7a907a', font: { size: 11 } }, grid: { color: '#2e382e' } },
+  },
+};
+function barChart(id, labels, data, color, opts = {}) {
+  const ctx = document.getElementById(id).getContext('2d');
+  return new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: color, borderRadius: 4, borderSkipped: false }] },
+    options: { ...CHART_DEFAULTS, ...opts },
+  });
+}
+function lineChart(id, labels, data) {
+  const ctx = document.getElementById(id).getContext('2d');
+  return new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [{ data, borderColor: '#5aab5a', backgroundColor: 'rgba(90,171,90,0.12)', fill: true, tension: 0.3, pointRadius: 2 }] },
+    options: { ...CHART_DEFAULTS },
+  });
+}
+function pieChart(id, labels, data, colors) {
+  const ctx = document.getElementById(id).getContext('2d');
+  return new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#232923', borderWidth: 2 }] },
+    options: { plugins: { legend: { display: true, labels: { color: '#7a907a', font: { size: 12 }, boxWidth: 12, padding: 12 } } } },
+  });
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const pct = (n, d) => d ? Math.round(100 * n / d) + '%' : '—';
+const avg = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length) : null;
+const fmt = n => n == null ? '—' : (n / 1000).toFixed(1) + 's';
+
+function dateKey(iso) { return iso.slice(0, 10); }
+
+function last30Days() {
+  const days = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    days.push(d.toISOString().slice(0, 10));
+  }
+  return days;
+}
+
+function barFill(value, max, color) {
+  return `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round(value/max*100)}%;background:${color}"></div></div>`;
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────────
+function render(events) {
+  if (!events.length) {
+    document.getElementById('status').textContent = 'No data yet';
+    return;
+  }
+  document.getElementById('status').textContent = `${events.length.toLocaleString()} events loaded`;
+  document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+
+  // ── Summary stats
+  const sessions = new Set(events.map(e => e.session_id)).size;
+  const correctCount = events.filter(e => e.correct).length;
+  const rtValues = events.map(e => e.response_time_ms).filter(v => v > 500 && v < 120000);
+  const mobileEvents = events.filter(e => e.mobile);
+  const mobileSessions = new Set(mobileEvents.map(e => e.session_id)).size;
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const todayCount = events.filter(e => dateKey(e.created_at) === todayKey).length;
+
+  document.getElementById('s-sessions').textContent  = sessions.toLocaleString();
+  document.getElementById('s-questions').textContent = events.length.toLocaleString();
+  document.getElementById('s-correct').textContent   = pct(correctCount, events.length);
+  document.getElementById('s-rt').textContent        = avg(rtValues) ? (avg(rtValues) / 1000).toFixed(1) : '—';
+  document.getElementById('s-mobile').textContent    = pct(mobileSessions, sessions);
+  document.getElementById('s-today').textContent     = todayCount.toLocaleString();
+
+  // ── Activity chart (questions per day, last 30 days)
+  const days = last30Days();
+  const byDay = {};
+  events.forEach(e => { const k = dateKey(e.created_at); byDay[k] = (byDay[k] || 0) + 1; });
+  lineChart('chart-activity', days.map(d => d.slice(5)), days.map(d => byDay[d] || 0));
+
+  // ── Mode pie
+  const modeCounts = {};
+  const seenSessions = new Set();
+  // Count selected_difficulty per session (use first event from each session)
+  const sessionMode = {};
+  [...events].reverse().forEach(e => { sessionMode[e.session_id] = e.selected_difficulty; });
+  Object.values(sessionMode).forEach(m => { modeCounts[m] = (modeCounts[m] || 0) + 1; });
+  const modeOrder = ['easy', 'medium', 'hard', 'expert', 'auto'];
+  const modeLabels = modeOrder.filter(m => modeCounts[m]);
+  const modeColors = { easy: '#5aab5a', medium: '#c8a030', hard: '#c05030', expert: '#9060c0', auto: '#4a90a4' };
+  pieChart('chart-modes', modeLabels.map(m => m.charAt(0).toUpperCase() + m.slice(1)), modeLabels.map(m => modeCounts[m] || 0), modeLabels.map(m => modeColors[m]));
+
+  // ── Correct % by difficulty
+  const diffs = ['easy', 'medium', 'hard', 'expert'];
+  const diffData = diffs.map(d => {
+    const sub = events.filter(e => e.difficulty === d);
+    return sub.length ? Math.round(100 * sub.filter(e => e.correct).length / sub.length) : null;
+  });
+  const diffColors = ['#5aab5a', '#c8a030', '#c05030', '#9060c0'];
+  barChart('chart-diff-correct',
+    diffs.map(d => d.charAt(0).toUpperCase() + d.slice(1)),
+    diffData,
+    diffColors,
+    { scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, min: 0, max: 100, ticks: { color: '#7a907a', font: { size: 11 }, callback: v => v + '%' } } } }
+  );
+
+  // ── Avg response time by difficulty
+  const diffRt = diffs.map(d => {
+    const vals = events.filter(e => e.difficulty === d && e.response_time_ms > 500 && e.response_time_ms < 120000).map(e => e.response_time_ms);
+    return vals.length ? +(avg(vals) / 1000).toFixed(1) : null;
+  });
+  barChart('chart-diff-rt',
+    diffs.map(d => d.charAt(0).toUpperCase() + d.slice(1)),
+    diffRt,
+    diffColors,
+    { scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, min: 0 } } }
+  );
+
+  // ── Most confusing real birds
+  // A real bird is "confusing" when picked_name === that bird's name AND correct === false
+  const confusedCount = {}, confusedShown = {};
+  events.forEach(e => {
+    [e.real_bird_1, e.real_bird_2].filter(Boolean).forEach(b => {
+      confusedShown[b] = (confusedShown[b] || 0) + 1;
+    });
+    if (!e.correct && e.picked_name) {
+      confusedCount[e.picked_name] = (confusedCount[e.picked_name] || 0) + 1;
+    }
+  });
+  const confusedList = Object.entries(confusedCount)
+    .filter(([b]) => confusedShown[b] >= 5)
+    .map(([b, n]) => ({ b, n, shown: confusedShown[b], rate: n / confusedShown[b] }))
+    .sort((a, z) => z.rate - a.rate)
+    .slice(0, 15);
+  const maxConfRate = Math.max(...confusedList.map(x => x.rate), 0.01);
+  document.getElementById('t-confused').innerHTML = confusedList.map(({ b, n, shown, rate }) =>
+    `<tr><td>${b}</td><td class="n-cell">${shown}</td><td class="pct-cell">${Math.round(rate*100)}%${barFill(rate, maxConfRate, '#d05050')}</td></tr>`
+  ).join('') || '<tr><td colspan="3" style="color:var(--muted);padding:12px 0">Not enough data yet</td></tr>';
+
+  // ── Most convincing fakes (shown N times, user got it wrong)
+  const fakeShown = {}, fakeEscaped = {};
+  events.forEach(e => {
+    if (e.fake_bird) {
+      fakeShown[e.fake_bird] = (fakeShown[e.fake_bird] || 0) + 1;
+      if (!e.correct) fakeEscaped[e.fake_bird] = (fakeEscaped[e.fake_bird] || 0) + 1;
+    }
+  });
+  const fakeList = Object.entries(fakeShown)
+    .filter(([f]) => fakeShown[f] >= 5)
+    .map(([f, shown]) => ({ f, shown, escaped: fakeEscaped[f] || 0, rate: (fakeEscaped[f] || 0) / shown }))
+    .sort((a, z) => z.rate - a.rate)
+    .slice(0, 15);
+  const maxFakeRate = Math.max(...fakeList.map(x => x.rate), 0.01);
+  document.getElementById('t-fakes').innerHTML = fakeList.map(({ f, shown, escaped, rate }) =>
+    `<tr><td>${f}</td><td class="n-cell">${shown}</td><td class="pct-cell">${Math.round(rate*100)}%${barFill(rate, maxFakeRate, '#d4a030')}</td></tr>`
+  ).join('') || '<tr><td colspan="3" style="color:var(--muted);padding:12px 0">Not enough data yet</td></tr>';
+
+  // ── Daily sessions table (last 14 days)
+  const last14 = last30Days().slice(16);
+  const dailySessions = {}, dailyQ = {}, dailyCorrect = {};
+  events.forEach(e => {
+    const k = dateKey(e.created_at);
+    if (!dailySessions[k]) dailySessions[k] = new Set();
+    dailySessions[k].add(e.session_id);
+    dailyQ[k] = (dailyQ[k] || 0) + 1;
+    if (e.correct) dailyCorrect[k] = (dailyCorrect[k] || 0) + 1;
+  });
+  document.getElementById('t-daily').innerHTML = last14.reverse().map(d => {
+    const s = dailySessions[d] ? dailySessions[d].size : 0;
+    const q = dailyQ[d] || 0;
+    const c = dailyCorrect[d] || 0;
+    if (!s) return `<tr><td>${d.slice(5)}</td><td class="n-cell" style="color:var(--muted)">—</td><td class="n-cell" style="color:var(--muted)">—</td><td class="pct-cell" style="color:var(--muted)">—</td></tr>`;
+    return `<tr><td>${d.slice(5)}</td><td class="n-cell">${s}</td><td class="n-cell">${q}</td><td class="pct-cell">${pct(c, q)}</td></tr>`;
+  }).join('');
+
+  // ── Difficulty breakdown table
+  const diffPill = { easy: 'pill-easy', medium: 'pill-medium', hard: 'pill-hard', expert: 'pill-expert' };
+  document.getElementById('t-diff').innerHTML = diffs.map((d, i) => {
+    const sub = events.filter(e => e.difficulty === d);
+    if (!sub.length) return '';
+    const cor = sub.filter(e => e.correct).length;
+    const rtVals = sub.map(e => e.response_time_ms).filter(v => v > 500 && v < 120000);
+    return `<tr>
+      <td><span class="pill ${diffPill[d]}">${d}</span></td>
+      <td class="n-cell">${sub.length}</td>
+      <td class="pct-cell">${pct(cor, sub.length)}</td>
+      <td class="n-cell">${rtVals.length ? (avg(rtVals)/1000).toFixed(1) : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init() {
+  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+    document.getElementById('config-warning').style.display = 'block';
+    document.getElementById('status').textContent = 'Not configured';
+    return;
+  }
+  try {
+    const events = await fetchEvents();
+    render(events);
+  } catch (e) {
+    document.getElementById('status').textContent = 'Error: ' + e.message;
+    console.error(e);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
