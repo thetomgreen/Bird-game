@@ -628,7 +628,7 @@ async function handleGuess(pickedFake, pickedName) {
   });
 
   document.getElementById('streak-display').innerHTML =
-    streak >= 2 ? `🔥 Current streak: <span>${streak}</span>` : '';
+    streak >= 1 ? `🔥 Current streak: <span>${streak}</span>` : '';
 
   const panel = document.getElementById('result-panel');
   panel.style.display = 'block';
