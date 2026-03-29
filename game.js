@@ -732,6 +732,13 @@ async function handleGuess(pickedFake, pickedName) {
   questionEl.className = 'question suspense';
   questionEl.innerHTML = `Let's find out…`;
 
+  // Glow the selected card yellow while waiting
+  const allBtns = document.querySelectorAll('.bird-btn');
+  allBtns.forEach(b => {
+    if (b.querySelector('.bird-name').textContent === pickedName) b.classList.add('pending');
+    b.disabled = true;
+  });
+
   await new Promise(r => setTimeout(r, 1000));
 
   if (pickedFake) {
