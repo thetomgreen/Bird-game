@@ -753,7 +753,7 @@ async function handleGuess(pickedFake, pickedName) {
           🎨 Imagine this bird
         </button>
         <div class="fake-bird-hatching" style="display:none">
-          <p class="hatching-text">hatching<span class="hatching-dots"></span></p>
+          <p class="hatching-text"><span class="hl" style="--i:0">h</span><span class="hl" style="--i:1">a</span><span class="hl" style="--i:2">t</span><span class="hl" style="--i:3">c</span><span class="hl" style="--i:4">h</span><span class="hl" style="--i:5">i</span><span class="hl" style="--i:6">n</span><span class="hl" style="--i:7">g</span><span class="hatching-dots"></span></p>
         </div>
         <div class="fake-bird-reveal" style="display:none">
           <p class="imagine-caption">AI imagined: <em>${fakeName}</em></p>
@@ -815,7 +815,7 @@ function revealFakeBird(btn) {
     clearInterval(dotsInterval);
     hatching.style.display = 'none';
     reveal.style.display = 'block';
-  }, 800);
+  }, 1200);
 }
 
 function nextRound() {

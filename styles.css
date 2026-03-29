@@ -517,20 +517,40 @@ h1 {
 
 .imagine-btn:active { background: rgba(240,192,96,0.16); }
 
+@keyframes hatch-bounce {
+  0%, 100% { transform: translateY(0); }
+  40%       { transform: translateY(-7px); }
+}
+
 .hatching-text {
   text-align: center;
-  font-size: 0.95rem;
+  font-size: 1.3rem;
   font-style: italic;
-  color: #f0c060;
   padding: 10px 0;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-weight: 800;
+  letter-spacing: 0.06em;
 }
+
+.hl {
+  display: inline-block;
+  animation: hatch-bounce 0.7s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.09s);
+}
+
+.hl:nth-child(1) { color: #ff6b6b; }
+.hl:nth-child(2) { color: #ffd93d; }
+.hl:nth-child(3) { color: #6bcb77; }
+.hl:nth-child(4) { color: #4d96ff; }
+.hl:nth-child(5) { color: #ff6b6b; }
+.hl:nth-child(6) { color: #f7b731; }
+.hl:nth-child(7) { color: #c77dff; }
+.hl:nth-child(8) { color: #ff9ff3; }
 
 .hatching-dots {
   display: inline-block;
   width: 1.5em;
   text-align: left;
+  color: #aaaaaa;
 }
 
 .imagine-caption {
