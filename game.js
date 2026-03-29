@@ -878,17 +878,19 @@ async function playBirdSound(url, btn) {
     const arrayBuffer = await response.arrayBuffer();
     const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
 
-    // Find first sample above silence threshold
+    // Find loudest 0.5s window, start 0.5s before it
     const data = audioBuffer.getChannelData(0);
     const sr = audioBuffer.sampleRate;
-    const threshold = 0.005;
-    let startSample = 0;
-    for (let i = 0; i < Math.min(data.length, sr * 60); i++) {
-      if (Math.abs(data[i]) > threshold) {
-        startSample = Math.max(0, i - Math.floor(sr * 0.15)); // 150ms before first sound
-        break;
-      }
+    const windowSize = Math.floor(sr * 0.5);
+    const scanSamples = Math.min(data.length, sr * 120); // scan up to 2 min
+    let bestRms = -1, bestWindow = 0;
+    for (let i = 0; i + windowSize < scanSamples; i += windowSize) {
+      let sum = 0;
+      for (let j = i; j < i + windowSize; j++) sum += data[j] * data[j];
+      const rms = Math.sqrt(sum / windowSize);
+      if (rms > bestRms) { bestRms = rms; bestWindow = i; }
     }
+    const startSample = Math.max(0, bestWindow - Math.floor(sr * 0.5));
 
     const source = ctx.createBufferSource();
     source.buffer = audioBuffer;
