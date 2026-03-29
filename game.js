@@ -590,24 +590,10 @@ if (new URLSearchParams(location.search).get('admin') === '1') {
   localStorage.setItem('rbof_admin', '1');
 }
 
-function logAnswer(pickedFake, pickedName) {
-  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') return; // not yet configured
-  if (window.NO_LOG) return;                        // nolog.html
-  if (localStorage.getItem('rbof_admin')) return;   // owner exclusion
-  const payload = {
-    session_id: sessionId,
-    question_number: questionCount + 1,
-    difficulty: getStyle(),
-    selected_difficulty: selectedDifficulty,
-    real_bird_1: currentRound.real[0].name,
-    real_bird_2: currentRound.real[1].name,
-    fake_bird: currentRound.fake,
-    picked_name: pickedName,
-    correct: pickedFake,
-    response_time_ms: questionStartTime ? Date.now() - questionStartTime : null,
-    mobile: /Mobi|Android/i.test(navigator.userAgent),
-    version: GAME_VERSION,
-  };
+function supabasePost(payload) {
+  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') return;
+  if (window.NO_LOG) return;
+  if (localStorage.getItem('rbof_admin')) return;
   fetch(`${SUPABASE_URL}/rest/v1/game_events`, {
     method: 'POST',
     headers: {
@@ -617,7 +603,37 @@ function logAnswer(pickedFake, pickedName) {
       'Prefer': 'return=minimal',
     },
     body: JSON.stringify(payload),
-  }).catch(() => {}); // fire and forget
+  }).catch(() => {});
+}
+
+function logAnswer(pickedFake, pickedName) {
+  const payload = {
+    event_type: 'answer',
+    session_id: sessionId,
+    question_number: questionCount + 1,
+    difficulty: getStyle(),
+    selected_difficulty: selectedDifficulty,
+    real_bird_1: currentRound.real[0].name,
+    real_bird_2: currentRound.real[1].name,
+    fake_bird: currentRound.fake,
+    picked_name: pickedName,
+    correct: pickedFake,
+    has_fake_image: !!currentRound.fakeImage,
+    response_time_ms: questionStartTime ? Date.now() - questionStartTime : null,
+    mobile: /Mobi|Android/i.test(navigator.userAgent),
+    version: GAME_VERSION,
+  };
+  supabasePost(payload);
+}
+
+function logReveal() {
+  supabasePost({
+    event_type: 'reveal',
+    session_id: sessionId,
+    question_number: questionCount + 1,
+    fake_bird: currentRound.fake,
+    version: GAME_VERSION,
+  });
 }
 
 // ── Game state ───────────────────────────────────────────────────────────────
@@ -853,6 +869,7 @@ async function handleGuess(pickedFake, pickedName) {
 }
 
 function revealFakeBird(btn) {
+  logReveal();
   btn.style.display = 'none';
   const hatching = btn.nextElementSibling;
   const reveal = hatching.nextElementSibling;

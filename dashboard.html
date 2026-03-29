@@ -100,6 +100,9 @@
     <div class="stat-card"><div class="label">Avg response</div><div class="value" id="s-rt">—</div><div class="sub">seconds</div></div>
     <div class="stat-card"><div class="label">Mobile</div><div class="value" id="s-mobile">—</div><div class="sub">of sessions</div></div>
     <div class="stat-card"><div class="label">Today</div><div class="value" id="s-today">—</div><div class="sub">questions</div></div>
+    <div class="stat-card"><div class="label">Games / session</div><div class="value" id="s-gps">—</div><div class="sub">avg</div></div>
+    <div class="stat-card"><div class="label">Games completed</div><div class="value" id="s-complete">—</div><div class="sub">all 6 questions</div></div>
+    <div class="stat-card"><div class="label">Images revealed</div><div class="value" id="s-revealed">—</div><div class="sub">of available</div></div>
   </div>
 
   <div class="charts-row">
@@ -261,34 +264,47 @@ function renderCharts(events) {
   document.getElementById('status').textContent = `${events.length.toLocaleString()} events loaded`;
   document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
 
+  const answerEvents = events.filter(e => !e.event_type || e.event_type === 'answer');
+  const revealEvents = events.filter(e => e.event_type === 'reveal');
+
   // ── Summary stats
-  const sessions = new Set(events.map(e => e.session_id)).size;
-  const correctCount = events.filter(e => e.correct).length;
-  const rtValues = events.map(e => e.response_time_ms).filter(v => v > 500 && v < 120000);
-  const mobileEvents = events.filter(e => e.mobile);
+  const sessions = new Set(answerEvents.map(e => e.session_id)).size;
+  const correctCount = answerEvents.filter(e => e.correct).length;
+  const rtValues = answerEvents.map(e => e.response_time_ms).filter(v => v > 500 && v < 120000);
+  const mobileEvents = answerEvents.filter(e => e.mobile);
   const mobileSessions = new Set(mobileEvents.map(e => e.session_id)).size;
   const todayKey = new Date().toISOString().slice(0, 10);
-  const todayCount = events.filter(e => dateKey(e.created_at) === todayKey).length;
+  const todayCount = answerEvents.filter(e => dateKey(e.created_at) === todayKey).length;
+
+  // games started = question_number===1 events; games completed = question_number===6
+  const gamesStarted = answerEvents.filter(e => e.question_number === 1).length;
+  const gamesCompleted = answerEvents.filter(e => e.question_number === 6).length;
+  const gamesPerSession = sessions ? (gamesStarted / sessions).toFixed(1) : '—';
+  const completePct = gamesStarted ? Math.round(100 * gamesCompleted / gamesStarted) + '%' : '—';
+  const imageAvailable = answerEvents.filter(e => e.has_fake_image).length;
+  const revealPct = imageAvailable ? Math.round(100 * revealEvents.length / imageAvailable) + '%' : '—';
 
   document.getElementById('s-sessions').textContent  = sessions.toLocaleString();
-  document.getElementById('s-questions').textContent = events.length.toLocaleString();
-  document.getElementById('s-correct').textContent   = pct(correctCount, events.length);
+  document.getElementById('s-questions').textContent = answerEvents.length.toLocaleString();
+  document.getElementById('s-correct').textContent   = pct(correctCount, answerEvents.length);
   document.getElementById('s-rt').textContent        = avg(rtValues) ? (avg(rtValues) / 1000).toFixed(1) : '—';
   document.getElementById('s-mobile').textContent    = pct(mobileSessions, sessions);
   document.getElementById('s-today').textContent     = todayCount.toLocaleString();
+  document.getElementById('s-gps').textContent       = gamesPerSession;
+  document.getElementById('s-complete').textContent  = completePct;
+  document.getElementById('s-revealed').textContent  = revealPct;
 
   // ── Activity chart (questions per day, last 30 days)
   const days = last30Days();
   const byDay = {};
-  events.forEach(e => { const k = dateKey(e.created_at); byDay[k] = (byDay[k] || 0) + 1; });
+  answerEvents.forEach(e => { const k = dateKey(e.created_at); byDay[k] = (byDay[k] || 0) + 1; });
   lineChart('chart-activity', days.map(d => d.slice(5)), days.map(d => byDay[d] || 0));
 
   // ── Mode pie
   const modeCounts = {};
-  const seenSessions = new Set();
   // Count selected_difficulty per session (use first event from each session)
   const sessionMode = {};
-  [...events].reverse().forEach(e => { sessionMode[e.session_id] = e.selected_difficulty; });
+  [...answerEvents].reverse().forEach(e => { sessionMode[e.session_id] = e.selected_difficulty; });
   Object.values(sessionMode).forEach(m => { modeCounts[m] = (modeCounts[m] || 0) + 1; });
   const modeOrder = ['easy', 'medium', 'hard', 'expert', 'auto'];
   const modeLabels = modeOrder.filter(m => modeCounts[m]);
@@ -298,7 +314,7 @@ function renderCharts(events) {
   // ── Correct % by difficulty
   const diffs = ['easy', 'medium', 'hard', 'expert'];
   const diffData = diffs.map(d => {
-    const sub = events.filter(e => e.difficulty === d);
+    const sub = answerEvents.filter(e => e.difficulty === d);
     return sub.length ? Math.round(100 * sub.filter(e => e.correct).length / sub.length) : null;
   });
   const diffColors = ['#5aab5a', '#c8a030', '#c05030', '#9060c0'];
@@ -311,7 +327,7 @@ function renderCharts(events) {
 
   // ── Avg response time by difficulty
   const diffRt = diffs.map(d => {
-    const vals = events.filter(e => e.difficulty === d && e.response_time_ms > 500 && e.response_time_ms < 120000).map(e => e.response_time_ms);
+    const vals = answerEvents.filter(e => e.difficulty === d && e.response_time_ms > 500 && e.response_time_ms < 120000).map(e => e.response_time_ms);
     return vals.length ? +(avg(vals) / 1000).toFixed(1) : null;
   });
   barChart('chart-diff-rt',
@@ -324,7 +340,7 @@ function renderCharts(events) {
   // ── Most confusing real birds
   // A real bird is "confusing" when picked_name === that bird's name AND correct === false
   const confusedCount = {}, confusedShown = {};
-  events.forEach(e => {
+  answerEvents.forEach(e => {
     [e.real_bird_1, e.real_bird_2].filter(Boolean).forEach(b => {
       confusedShown[b] = (confusedShown[b] || 0) + 1;
     });
@@ -344,7 +360,7 @@ function renderCharts(events) {
 
   // ── Most convincing fakes (shown N times, user got it wrong)
   const fakeShown = {}, fakeEscaped = {};
-  events.forEach(e => {
+  answerEvents.forEach(e => {
     if (e.fake_bird) {
       fakeShown[e.fake_bird] = (fakeShown[e.fake_bird] || 0) + 1;
       if (!e.correct) fakeEscaped[e.fake_bird] = (fakeEscaped[e.fake_bird] || 0) + 1;
@@ -363,7 +379,7 @@ function renderCharts(events) {
   // ── Daily sessions table (last 14 days)
   const last14 = last30Days().slice(16);
   const dailySessions = {}, dailyQ = {}, dailyCorrect = {};
-  events.forEach(e => {
+  answerEvents.forEach(e => {
     const k = dateKey(e.created_at);
     if (!dailySessions[k]) dailySessions[k] = new Set();
     dailySessions[k].add(e.session_id);
@@ -381,7 +397,7 @@ function renderCharts(events) {
   // ── Difficulty breakdown table
   const diffPill = { easy: 'pill-easy', medium: 'pill-medium', hard: 'pill-hard', expert: 'pill-expert' };
   document.getElementById('t-diff').innerHTML = diffs.map((d, i) => {
-    const sub = events.filter(e => e.difficulty === d);
+    const sub = answerEvents.filter(e => e.difficulty === d);
     if (!sub.length) return '';
     const cor = sub.filter(e => e.correct).length;
     const rtVals = sub.map(e => e.response_time_ms).filter(v => v > 500 && v < 120000);
