@@ -38,11 +38,12 @@ async function test(label, url) {
 }
 
 async function main() {
-  // Test a few query formats with a well-known bird
-  await test('plain name',       'https://xeno-canto.org/api/2/recordings?query=Barn+Owl');
-  await test('en: prefix',       'https://xeno-canto.org/api/2/recordings?query=en:Barn+Owl');
-  await test('quoted en:',       'https://xeno-canto.org/api/2/recordings?query=en:%22Barn+Owl%22');
-  await test('African Fish Eagle', 'https://xeno-canto.org/api/2/recordings?query=African+Fish+Eagle');
+  // Test with www subdomain
+  await test('www + plain name', 'https://www.xeno-canto.org/api/2/recordings?query=Barn+Owl');
+  await test('www + en:',        'https://www.xeno-canto.org/api/2/recordings?query=en:Barn+Owl');
+  // Test API v3 (newer endpoint some sources mention)
+  await test('api/3',            'https://xeno-canto.org/api/3/recordings?query=Barn+Owl');
+  await test('www + api/3',      'https://www.xeno-canto.org/api/3/recordings?query=Barn+Owl');
 }
 
 main();
