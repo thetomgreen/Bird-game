@@ -749,9 +749,12 @@ async function handleGuess(pickedFake, pickedName) {
       const expand = document.createElement('div');
       expand.className = 'bird-expand fake-imagine';
       expand.innerHTML = `
-        <button class="imagine-btn" onclick="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <button class="imagine-btn" onclick="revealFakeBird(this)">
           🎨 Imagine this bird
         </button>
+        <div class="fake-bird-hatching" style="display:none">
+          <p class="hatching-text">hatching<span class="hatching-dots"></span></p>
+        </div>
         <div class="fake-bird-reveal" style="display:none">
           <p class="imagine-caption">AI imagined: <em>${fakeName}</em></p>
           <div class="photo-wrap">
@@ -792,6 +795,27 @@ async function handleGuess(pickedFake, pickedName) {
       wrap.style.display = 'none';
     }
   });
+}
+
+function revealFakeBird(btn) {
+  btn.style.display = 'none';
+  const hatching = btn.nextElementSibling;
+  const reveal = hatching.nextElementSibling;
+  hatching.style.display = 'block';
+
+  // Animate the dots: . .. ...
+  let dots = 0;
+  const dotsEl = hatching.querySelector('.hatching-dots');
+  const dotsInterval = setInterval(() => {
+    dots = (dots + 1) % 4;
+    dotsEl.textContent = '.'.repeat(dots);
+  }, 200);
+
+  setTimeout(() => {
+    clearInterval(dotsInterval);
+    hatching.style.display = 'none';
+    reveal.style.display = 'block';
+  }, 800);
 }
 
 function nextRound() {

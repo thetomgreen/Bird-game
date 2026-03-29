@@ -517,6 +517,22 @@ h1 {
 
 .imagine-btn:active { background: rgba(240,192,96,0.16); }
 
+.hatching-text {
+  text-align: center;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: #f0c060;
+  padding: 10px 0;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.hatching-dots {
+  display: inline-block;
+  width: 1.5em;
+  text-align: left;
+}
+
 .imagine-caption {
   font-size: 0.85rem;
   color: #cccccc;
