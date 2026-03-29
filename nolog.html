@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Real Bird or Fake? — Can you spot the made-up bird?</title>
+  <meta name="description" content="Three birds. One is fake. Can you spot it? A fun bird trivia guessing game.">
+  <meta property="og:title" content="Real Bird or Fake?">
+  <meta property="og:description" content="Three birds. One is fake. Can you spot it?">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://realbirdorfake.com">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Real Bird or Fake?">
+  <meta name="twitter:description" content="Three birds. One is fake. Can you spot it?">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐦</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <h1>🐦 Real Bird or Fake?</h1>
+  <p class="subtitle">One of these birds doesn't exist. Which one?</p>
+</header>
+
+<div class="score-bar" id="score-bar" style="display:none">
+  <div>Score: <span id="score">0</span></div>
+  <div>Best streak: <span id="best-streak">0</span></div>
+</div>
+
+<div id="welcome-screen">
+  <div class="welcome-content">
+    <p class="welcome-prompt">Choose your difficulty to begin:</p>
+    <div class="welcome-diff-grid">
+      <button class="welcome-diff-btn" onclick="pickDifficulty('easy')">
+        <span class="wdb-label">Easy</span>
+      </button>
+      <button class="welcome-diff-btn" onclick="pickDifficulty('medium')">
+        <span class="wdb-label">Medium</span>
+      </button>
+      <button class="welcome-diff-btn" onclick="pickDifficulty('hard')">
+        <span class="wdb-label">Hard</span>
+      </button>
+      <button class="welcome-diff-btn" onclick="pickDifficulty('expert')">
+        <span class="wdb-label">Expert</span>
+      </button>
+      <button class="welcome-diff-btn welcome-auto" onclick="pickDifficulty('auto')">
+        <span class="wdb-label">🔄 Auto <span class="wdb-auto-note">(adjusts automatically)</span></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="game-screen" style="display:none">
+  <div class="question-meta">
+    <div id="question-progress" class="question-progress">Question 1 of 6</div>
+    <div class="adaptive-label" id="adaptive-label"></div>
+  </div>
+  <p class="question">Tap the bird you think is <strong>made up</strong></p>
+  <div class="bird-cards" id="bird-cards"></div>
+  <div id="result-panel">
+    <button class="next-btn" id="next-btn" onclick="nextRound()">Next bird →</button>
+    <div class="streak" id="streak-display"></div>
+  </div>
+  <div class="adjust-difficulty" id="adjust-difficulty">
+    <button class="adjust-btn" id="easier-btn" onclick="adjustDifficulty(-1)">↓ Restart easier</button>
+    <button class="adjust-btn" id="harder-btn" onclick="adjustDifficulty(+1)">↑ Restart harder</button>
+  </div>
+</div>
+
+<div id="end-screen" style="display:none">
+  <div class="end-content">
+    <h2 id="end-title">Game Over!</h2>
+    <div class="end-score-display">
+      <span id="final-score">0</span><span class="out-of">/6</span>
+    </div>
+    <div class="end-difficulty-label">Difficulty: <span id="final-difficulty">Auto</span></div>
+    <div class="auto-ready-msg" id="auto-ready-msg" style="display:none"></div>
+    <div class="end-next-section">
+      <p class="end-next-label">Play again?</p>
+      <div class="diff-pills">
+        <button class="diff-btn" data-level="easy" onclick="setDifficultyOnly('easy')">Easy</button>
+        <button class="diff-btn" data-level="medium" onclick="setDifficultyOnly('medium')">Med</button>
+        <button class="diff-btn" data-level="hard" onclick="setDifficultyOnly('hard')">Hard</button>
+        <button class="diff-btn" data-level="expert" onclick="setDifficultyOnly('expert')">Expert</button>
+        <button class="diff-btn active" data-level="auto" onclick="setDifficultyOnly('auto')">Auto</button>
+      </div>
+      <button class="next-btn" onclick="startGame()">Play Again →</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>window.NO_LOG = true;</script>
+<script src="birds.js"></script>
+<script src="fake-names.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

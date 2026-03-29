@@ -591,6 +591,7 @@ if (new URLSearchParams(location.search).get('admin') === '1') {
 
 function logAnswer(pickedFake, pickedName) {
   if (SUPABASE_URL === 'YOUR_SUPABASE_URL') return; // not yet configured
+  if (window.NO_LOG) return;                        // nolog.html
   if (localStorage.getItem('rbof_admin')) return;   // owner exclusion
   const payload = {
     session_id: sessionId,
