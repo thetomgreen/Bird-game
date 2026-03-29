@@ -579,8 +579,8 @@ const HARD_BIRDS_P   = HARD_BIRDS.filter(b => b.photo);
 
 // ── Analytics ────────────────────────────────────────────────────────────────
 // Set these after creating a Supabase project (see supabase-schema.sql)
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://njuczbzwaiiflkyecevh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_k8VKAOPtMFSU-dOVgRrnvg_-H2gexf0';
 
 const sessionId = crypto.randomUUID();
 let questionStartTime = null;
