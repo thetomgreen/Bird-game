@@ -127,11 +127,11 @@ h1 {
 
 .you-picked-label {
   font-size: 0.78rem;
-  color: #e05050;
   font-weight: 600;
   margin-top: 4px;
-  padding-right: 3.5rem;
 }
+.you-picked-label.correct { color: #4caf50; }
+.you-picked-label.wrong   { color: #e05050; }
 
 .bird-expand {
   margin-top: 14px;

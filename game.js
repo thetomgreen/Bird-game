@@ -708,7 +708,7 @@ async function handleGuess(pickedFake, pickedName) {
     // Big check or cross on the clicked card
     if (wasClicked) {
       const picked = document.createElement('div');
-      picked.className = 'you-picked-label';
+      picked.className = pickedFake ? 'you-picked-label correct' : 'you-picked-label wrong';
       picked.textContent = 'You picked';
       btn.querySelector('.bird-name').after(picked);
     }
@@ -813,15 +813,15 @@ function revealFakeBird(btn) {
     dotsEl.textContent = '.'.repeat(dots);
   }, 200);
 
-  // Crack the egg at 1s
+  // Crack the egg at 1.2s
   const eggEl = hatching.querySelector('.egg-anim');
-  setTimeout(() => { if (eggEl) eggEl.textContent = '🐣'; }, 1000);
+  setTimeout(() => { if (eggEl) eggEl.textContent = '🐣'; }, 1200);
 
   setTimeout(() => {
     clearInterval(dotsInterval);
     hatching.style.display = 'none';
     reveal.style.display = 'block';
-  }, 1300);
+  }, 1500);
 }
 
 function nextRound() {
