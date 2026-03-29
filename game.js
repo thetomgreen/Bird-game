@@ -707,25 +707,26 @@ async function handleGuess(pickedFake, pickedName) {
 
     // Big check or cross on the clicked card
     if (wasClicked) {
-      const icon = document.createElement('div');
-      icon.className = pickedFake ? 'result-icon correct-icon' : 'result-icon wrong-icon';
-      icon.textContent = pickedFake ? '✓' : '✗';
-      btn.appendChild(icon);
-    }
-
-    // "You picked" tag on the selected wrong card
-    if (wasClicked && !pickedFake) {
       const picked = document.createElement('div');
       picked.className = 'you-picked-label';
       picked.textContent = 'You picked';
       btn.querySelector('.bird-name').after(picked);
     }
 
-    // Bird/robot label
+    // Label + icon footer (inline, vertically aligned)
+    const footer = document.createElement('div');
+    footer.className = 'card-footer';
     const label = document.createElement('div');
     label.className = `result-label ${isFakeBtn ? 'label-fake' : 'label-real'}`;
     label.textContent = isFakeBtn ? '🤖 Fake' : '🐦 Real';
-    btn.appendChild(label);
+    footer.appendChild(label);
+    if (wasClicked) {
+      const icon = document.createElement('div');
+      icon.className = pickedFake ? 'result-icon correct-icon' : 'result-icon wrong-icon';
+      icon.textContent = pickedFake ? '✓' : '✗';
+      footer.appendChild(icon);
+    }
+    btn.appendChild(footer);
 
     // Expand real bird cards with photo + fact
     if (!isFakeBtn) {
@@ -753,6 +754,7 @@ async function handleGuess(pickedFake, pickedName) {
           🎨 Imagine this bird
         </button>
         <div class="fake-bird-hatching" style="display:none">
+          <div class="egg-anim">🥚</div>
           <p class="hatching-text"><span class="hl" style="--i:0">h</span><span class="hl" style="--i:1">a</span><span class="hl" style="--i:2">t</span><span class="hl" style="--i:3">c</span><span class="hl" style="--i:4">h</span><span class="hl" style="--i:5">i</span><span class="hl" style="--i:6">n</span><span class="hl" style="--i:7">g</span><span class="hatching-dots"></span></p>
         </div>
         <div class="fake-bird-reveal" style="display:none">
@@ -811,11 +813,15 @@ function revealFakeBird(btn) {
     dotsEl.textContent = '.'.repeat(dots);
   }, 200);
 
+  // Crack the egg at 1s
+  const eggEl = hatching.querySelector('.egg-anim');
+  setTimeout(() => { if (eggEl) eggEl.textContent = '🐣'; }, 1000);
+
   setTimeout(() => {
     clearInterval(dotsInterval);
     hatching.style.display = 'none';
     reveal.style.display = 'block';
-  }, 1200);
+  }, 1300);
 }
 
 function nextRound() {
