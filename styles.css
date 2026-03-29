@@ -310,6 +310,7 @@ h1 {
 }
 
 .welcome-auto .wdb-label { color: #f0c060; }
+.wdb-auto-note { font-size: 0.78rem; font-weight: 400; color: #aaaaaa; }
 
 /* ── Question meta (progress + adaptive label) ─────────────────────────────── */
 .question-meta {
