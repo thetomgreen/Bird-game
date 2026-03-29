@@ -276,9 +276,14 @@ function renderCharts(events) {
   const todayKey = new Date().toISOString().slice(0, 10);
   const todayCount = answerEvents.filter(e => dateKey(e.created_at) === todayKey).length;
 
-  // games started = question_number===1 events; games completed = question_number===6
+  // Derive max question number per version from the data — avoids hardcoding rounds per game
+  const maxQByVersion = {};
+  answerEvents.forEach(e => {
+    const v = e.version || 'unknown';
+    if (!maxQByVersion[v] || e.question_number > maxQByVersion[v]) maxQByVersion[v] = e.question_number;
+  });
   const gamesStarted = answerEvents.filter(e => e.question_number === 1).length;
-  const gamesCompleted = answerEvents.filter(e => e.question_number === 6).length;
+  const gamesCompleted = answerEvents.filter(e => e.question_number === maxQByVersion[e.version || 'unknown']).length;
   const gamesPerSession = sessions ? (gamesStarted / sessions).toFixed(1) : '—';
   const completePct = gamesStarted ? Math.round(100 * gamesCompleted / gamesStarted) + '%' : '—';
   const imageAvailable = answerEvents.filter(e => e.has_fake_image).length;
