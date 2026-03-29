@@ -851,7 +851,21 @@ function showEndScreen() {
   ];
 
   document.getElementById('end-title').textContent = messages[gameScore] ?? 'Game Over!';
-  document.getElementById('final-score').textContent = gameScore;
+
+  // Count-up animation for score
+  const scoreEl = document.getElementById('final-score');
+  const scoreDisplay = scoreEl.closest('.end-score-display');
+  scoreEl.textContent = '0';
+  scoreDisplay.classList.remove('perfect');
+  let count = 0;
+  const countUp = setInterval(() => {
+    count++;
+    scoreEl.textContent = count;
+    if (count >= gameScore) {
+      clearInterval(countUp);
+      if (gameScore === ROUNDS_PER_GAME) scoreDisplay.classList.add('perfect');
+    }
+  }, 120);
 
   document.querySelectorAll('#end-screen .diff-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.level === selectedDifficulty);
