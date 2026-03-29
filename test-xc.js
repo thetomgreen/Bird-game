@@ -1,23 +1,14 @@
 #!/usr/bin/env node
 // Quick diagnostic — run on your Mac:
 //   node test-xc.js
-// Tests a few query formats against the xeno-canto API and shows raw results
+// Tests iNaturalist sound observations API
 
 const https = require('https');
 
-function get(url, depth = 0) {
-  if (depth > 5) return Promise.reject(new Error('too many redirects'));
+function get(url) {
   return new Promise((resolve, reject) => {
     const req = https.get(url, { headers: { 'User-Agent': 'BirdGame/1.0' } }, res => {
-      console.log(`  HTTP ${res.statusCode} → ${url}`);
-      if ((res.statusCode === 301 || res.statusCode === 302) && res.headers.location) {
-        const next = res.headers.location.startsWith('http')
-          ? res.headers.location
-          : new URL(res.headers.location, url).href;
-        res.resume();
-        resolve(get(next, depth + 1));
-        return;
-      }
+      console.log(`  HTTP ${res.statusCode} → ${url.slice(0, 100)}`);
       let data = '';
       res.on('data', c => data += c);
       res.on('end', () => {
@@ -30,16 +21,27 @@ function get(url, depth = 0) {
   });
 }
 
-async function test(label, url) {
+async function test(label, name) {
   console.log(`\n--- ${label} ---`);
+  const q = encodeURIComponent(name);
+  const url = `https://api.inaturalist.org/v1/observations?sounds=true&taxon_name=${q}&quality_grade=research&order_by=votes&per_page=5`;
   console.log('URL:', url);
   try {
     const d = await get(url);
-    console.log('numRecordings:', d.numRecordings);
-    console.log('recordings array length:', Array.isArray(d.recordings) ? d.recordings.length : typeof d.recordings);
-    if (Array.isArray(d.recordings) && d.recordings.length > 0) {
-      const r = d.recordings[0];
-      console.log('First recording:', { en: r.en, q: r.q, type: r.type, length: r.length, file: r.file });
+    console.log('total_results:', d.total_results);
+    const results = d.results || [];
+    console.log('results count:', results.length);
+    if (results.length > 0) {
+      const obs = results[0];
+      console.log('First obs id:', obs.id, '| sounds count:', (obs.sounds || []).length);
+      (obs.sounds || []).forEach((snd, i) => {
+        console.log(`  sound[${i}]:`, JSON.stringify({
+          subtype: snd.subtype,
+          file_url: snd.file_url,
+          file: snd.file,
+          attribution: snd.attribution,
+        }));
+      });
     }
   } catch (e) {
     console.log('Error:', e.message);
@@ -47,12 +49,10 @@ async function test(label, url) {
 }
 
 async function main() {
-  // Test with www subdomain
-  await test('www + plain name', 'https://www.xeno-canto.org/api/2/recordings?query=Barn+Owl');
-  await test('www + en:',        'https://www.xeno-canto.org/api/2/recordings?query=en:Barn+Owl');
-  // Test API v3 (newer endpoint some sources mention)
-  await test('api/3',            'https://xeno-canto.org/api/3/recordings?query=Barn+Owl');
-  await test('www + api/3',      'https://www.xeno-canto.org/api/3/recordings?query=Barn+Owl');
+  await test('Barn Owl', 'Barn Owl');
+  await test('Atlantic Puffin', 'Atlantic Puffin');
+  await test('Common Loon', 'Common Loon');
+  await test('Peregrine Falcon', 'Peregrine Falcon');
 }
 
 main();
