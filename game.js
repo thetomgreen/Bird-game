@@ -581,6 +581,7 @@ const HARD_BIRDS_P   = HARD_BIRDS.filter(b => b.photo);
 // Set these after creating a Supabase project (see supabase-schema.sql)
 const SUPABASE_URL = 'https://njuczbzwaiiflkyecevh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_k8VKAOPtMFSU-dOVgRrnvg_-H2gexf0';
+const GAME_VERSION = '1.0';
 
 const sessionId = crypto.randomUUID();
 let questionStartTime = null;
@@ -605,6 +606,7 @@ function logAnswer(pickedFake, pickedName) {
     correct: pickedFake,
     response_time_ms: questionStartTime ? Date.now() - questionStartTime : null,
     mobile: /Mobi|Android/i.test(navigator.userAgent),
+    version: GAME_VERSION,
   };
   fetch(`${SUPABASE_URL}/rest/v1/game_events`, {
     method: 'POST',
