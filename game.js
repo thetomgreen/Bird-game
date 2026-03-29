@@ -813,15 +813,17 @@ function revealFakeBird(btn) {
     dotsEl.textContent = '.'.repeat(dots);
   }, 200);
 
-  // Crack the egg at 1.2s
   const eggEl = hatching.querySelector('.egg-anim');
-  setTimeout(() => { if (eggEl) eggEl.textContent = '🐣'; }, 1200);
+  // 0.3s: crack
+  setTimeout(() => { if (eggEl) eggEl.textContent = '🐣'; }, 300);
+  // 0.8s: chick emerging
+  setTimeout(() => { if (eggEl) eggEl.textContent = '🐥'; }, 800);
 
   setTimeout(() => {
     clearInterval(dotsInterval);
     hatching.style.display = 'none';
     reveal.style.display = 'block';
-  }, 1500);
+  }, 1400);
 }
 
 function nextRound() {
