@@ -366,6 +366,11 @@ function render(events) {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
+if (new URLSearchParams(location.search).get('admin') === '1') {
+  localStorage.setItem('rbof_admin', '1');
+  document.getElementById('status').textContent = 'Admin mode enabled on this device ✓';
+}
+
 async function init() {
   if (SUPABASE_URL === 'YOUR_SUPABASE_URL') {
     document.getElementById('config-warning').style.display = 'block';
