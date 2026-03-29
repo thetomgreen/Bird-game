@@ -245,11 +245,11 @@ h1 {
   text-align: center;
   font-size: 0.82rem;
   color: #e8e8e8;
-  padding-bottom: 8px;
+  padding-top: 4px;
 }
 
 .streak:not(:empty) {
-  padding-top: 22px;
+  padding-bottom: 16px;
 }
 
 .streak span { color: #f0c060; font-weight: bold; }
