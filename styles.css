@@ -249,7 +249,7 @@ h1 {
 }
 
 .streak:not(:empty) {
-  padding-top: 16px;
+  padding-top: 22px;
 }
 
 .streak span { color: #f0c060; font-weight: bold; }
