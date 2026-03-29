@@ -427,20 +427,13 @@ function fetchBirdPhoto(bird) {
 }
 
 // ── Bird pools ────────────────────────────────────────────────────────────────
-// Famous birds excluded from hard mode so recognisable names don't give it away.
-// Toco Toucan, Keel-billed Toucan, Victoria Crowned Pigeon, Hoatzin kept in all pools.
-// Wandering Albatross, Blue-footed Booby, Tufted Puffin, Roseate Spoonbill,
-// Superb Lyrebird, Laughing Kookaburra, Magnificent Frigatebird kept in hard (easier).
-const FAMOUS_NAMES = new Set([
-  'Ostrich', 'Indian Peafowl', 'Emu', 'Cassowary', 'Kiwi',
-  'Atlantic Puffin', 'Snowy Owl', 'Barn Owl',
-  'Peregrine Falcon', 'Common Loon', 'Greater Roadrunner', 'Osprey',
-  'California Condor', 'Whooping Crane', 'Emperor Penguin',
-  'Mandarin Duck', 'Harpy Eagle', 'Resplendent Quetzal', 'Kakapo',
-  'Bee Hummingbird', 'Andean Condor', 'Red-tailed Hawk',
-]);
-const OBSCURE_BIRDS  = BIRDS.filter(b => !FAMOUS_NAMES.has(b.name) && b.photo);
-const FAMOUS_BIRDS   = BIRDS.filter(b =>  FAMOUS_NAMES.has(b.name) && b.photo);
+// Pools are now built from the fame score on each bird (1=expert only, 5=universal).
+// medium: fame 3-4 — recognisable to nature fans, varied name lengths
+// easy:   all birds with photos
+// hard:   fame 1-2 — obscure birds (BIRDS array only, no HARD_BIRDS)
+// expert: HARD_BIRDS only (compound Asian/tropical names)
+const MEDIUM_BIRDS   = BIRDS.filter(b => b.photo && b.fame >= 3 && b.fame <= 4);
+const OBSCURE_BIRDS  = BIRDS.filter(b => b.photo && b.fame <= 2);
 const ALL_BIRDS      = BIRDS.filter(b => b.photo);
 const HARD_BIRDS_P   = HARD_BIRDS.filter(b => b.photo);
 
@@ -449,8 +442,8 @@ const ROUNDS_PER_GAME = 5;
 let questionCount = 0, gameScore = 0;
 let score = 0, streak = 0, bestStreak = 0;
 let currentRound = null, answered = false;
-let birdPool = [];        // shuffled indices for BIRDS (easy)
-let famousBirdPool = [];  // shuffled indices for FAMOUS_BIRDS (medium)
+let birdPool = [];        // shuffled indices for ALL_BIRDS (easy)
+let famousBirdPool = [];  // shuffled indices for MEDIUM_BIRDS (medium)
 let obscureBirdPool = []; // shuffled indices for OBSCURE_BIRDS (hard)
 let hardBirdPool = [];    // shuffled indices for HARD_BIRDS (expert)
 let photoPromises = [];
@@ -475,8 +468,8 @@ function pickTwoBirds() {
     return [OBSCURE_BIRDS[obscureBirdPool.pop()], OBSCURE_BIRDS[obscureBirdPool.pop()]];
   }
   if (style === 'medium') {
-    if (famousBirdPool.length < 2) famousBirdPool = shuffle([...Array(FAMOUS_BIRDS.length).keys()]);
-    return [FAMOUS_BIRDS[famousBirdPool.pop()], FAMOUS_BIRDS[famousBirdPool.pop()]];
+    if (famousBirdPool.length < 2) famousBirdPool = shuffle([...Array(MEDIUM_BIRDS.length).keys()]);
+    return [MEDIUM_BIRDS[famousBirdPool.pop()], MEDIUM_BIRDS[famousBirdPool.pop()]];
   }
   if (birdPool.length < 2) birdPool = shuffle([...Array(ALL_BIRDS.length).keys()]);
   return [ALL_BIRDS[birdPool.pop()], ALL_BIRDS[birdPool.pop()]];

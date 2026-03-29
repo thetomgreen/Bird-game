@@ -173,13 +173,15 @@ function generateFakeName() {
         name = `${pick(SILLY.longScale)} ${pick(SILLY.longAdj)} ${pick(SILLY.longNoun)}${pick(SILLY.longSuf)}`;
       }
     } else if (style === 'medium') {
-      if (len === 0) {
+      // Weighted: 40% short, 40% medium, 20% long — so name length doesn't give away the fake
+      const medLen = Math.random() < 0.4 ? 0 : Math.random() < 0.67 ? 1 : 2;
+      if (medLen === 0) {
         name = pick(PLAUSIBLE.shortPre) + pick(PLAUSIBLE.shortSuf);
-      } else if (len === 1) {
+      } else if (medLen === 1) {
         const adj = Math.random() < 0.3 ? pick(PLAUSIBLE.medHyphen) : pick(PLAUSIBLE.medSimple);
         name = `${adj} ${pick(PLAUSIBLE.medMod)}${pick(PLAUSIBLE.medType)}`;
       } else {
-        if (Math.random() < 0.7) {
+        if (Math.random() < 0.5) {
           name = `${pick(PLAUSIBLE.longColor)}-${pick(PLAUSIBLE.longPart)} ${pick(PLAUSIBLE.longHab)}${pick(PLAUSIBLE.longType)}`;
         } else {
           name = `${pick(PLAUSIBLE.scale)} ${pick(PLAUSIBLE.longHab)}${pick(PLAUSIBLE.longType)}`;
