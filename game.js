@@ -720,6 +720,19 @@ async function handleGuess(pickedFake, pickedName) {
     label.className = `result-label ${isFakeBtn ? 'label-fake' : 'label-real'}`;
     label.textContent = isFakeBtn ? '🤖 Fake' : '🐦 Real';
     footer.appendChild(label);
+    // Sound button for real birds that have a sound URL
+    if (!isFakeBtn) {
+      const birdIdx = parseInt(btn.dataset.birdIdx);
+      const bird = currentRound.real[birdIdx];
+      if (bird.sound) {
+        const soundBtn = document.createElement('button');
+        soundBtn.className = 'sound-btn';
+        soundBtn.textContent = '🔈';
+        soundBtn.title = `Hear the ${bird.name}`;
+        soundBtn.onclick = (e) => { e.stopPropagation(); playBirdSound(bird.sound, soundBtn); };
+        footer.appendChild(soundBtn);
+      }
+    }
     if (wasClicked) {
       const icon = document.createElement('div');
       icon.className = pickedFake ? 'result-icon correct-icon' : 'result-icon wrong-icon';
@@ -833,6 +846,74 @@ function revealFakeBird(btn) {
     hatching.style.display = 'none';
     reveal.style.display = 'block';
   }, 1400);
+}
+
+// ── Bird sound playback ───────────────────────────────────────────────────────
+let activeSoundSource = null;
+let activeSoundBtn = null;
+
+async function playBirdSound(url, btn) {
+  // Stop any currently playing sound
+  if (activeSoundSource) {
+    try { activeSoundSource.stop(); } catch(e) {}
+    activeSoundSource = null;
+  }
+  if (activeSoundBtn && activeSoundBtn !== btn) {
+    activeSoundBtn.textContent = '🔈';
+  }
+  // Toggle off if same button clicked while playing
+  if (activeSoundBtn === btn && btn.textContent === '🔊') {
+    activeSoundBtn = null;
+    btn.textContent = '🔈';
+    return;
+  }
+
+  btn.textContent = '⏳';
+  activeSoundBtn = btn;
+
+  try {
+    // Web Audio API path — allows trimming leading silence
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+
+    // Find first sample above silence threshold
+    const data = audioBuffer.getChannelData(0);
+    const sr = audioBuffer.sampleRate;
+    const threshold = 0.005;
+    let startSample = 0;
+    for (let i = 0; i < Math.min(data.length, sr * 60); i++) {
+      if (Math.abs(data[i]) > threshold) {
+        startSample = Math.max(0, i - Math.floor(sr * 0.15)); // 150ms before first sound
+        break;
+      }
+    }
+
+    const source = ctx.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(ctx.destination);
+    source.start(0, startSample / sr, 6);
+    activeSoundSource = source;
+    btn.textContent = '🔊';
+
+    source.onended = () => {
+      if (activeSoundBtn === btn) { btn.textContent = '🔈'; activeSoundBtn = null; }
+      ctx.close();
+    };
+
+  } catch (e) {
+    // CORS blocked or Web Audio unavailable — fall back to HTML5 Audio from start
+    const audio = new Audio(url);
+    activeSoundSource = audio;
+    audio.play().then(() => {
+      btn.textContent = '🔊';
+      setTimeout(() => {
+        audio.pause();
+        if (activeSoundBtn === btn) { btn.textContent = '🔈'; activeSoundBtn = null; }
+      }, 6000);
+    }).catch(() => { btn.textContent = '🔈'; activeSoundBtn = null; });
+  }
 }
 
 function nextRound() {

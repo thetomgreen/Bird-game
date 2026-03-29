@@ -112,9 +112,24 @@ h1 {
 .card-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   margin-top: 4px;
 }
+
+.sound-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0.75;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.sound-btn:hover, .sound-btn:active { opacity: 1; }
 
 .result-icon {
   font-size: 2.2rem;
