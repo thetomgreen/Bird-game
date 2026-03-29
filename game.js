@@ -572,9 +572,9 @@ function fetchBirdPhoto(bird) {
 // easy:   all birds with photos
 // hard:   fame 1-2 — obscure birds (BIRDS array only, no HARD_BIRDS)
 // expert: HARD_BIRDS only (compound Asian/tropical names)
+const EASY_BIRDS     = BIRDS.filter(b => b.photo && b.fame >= 3);
 const MEDIUM_BIRDS   = BIRDS.filter(b => b.photo && b.fame >= 3 && b.fame <= 4);
 const OBSCURE_BIRDS  = BIRDS.filter(b => b.photo && b.fame <= 2);
-const ALL_BIRDS      = BIRDS.filter(b => b.photo);
 const HARD_BIRDS_P   = HARD_BIRDS.filter(b => b.photo);
 
 // ── Game state ───────────────────────────────────────────────────────────────
@@ -582,7 +582,7 @@ const ROUNDS_PER_GAME = 6;
 let questionCount = 0, gameScore = 0;
 let score = 0, streak = 0, bestStreak = 0;
 let currentRound = null, answered = false;
-let birdPool = [];        // shuffled indices for ALL_BIRDS (easy)
+let birdPool = [];        // shuffled indices for EASY_BIRDS (easy)
 let famousBirdPool = [];  // shuffled indices for MEDIUM_BIRDS (medium)
 let obscureBirdPool = []; // shuffled indices for OBSCURE_BIRDS (hard)
 let hardBirdPool = [];    // shuffled indices for HARD_BIRDS (expert)
@@ -613,8 +613,8 @@ function pickTwoBirds() {
     if (famousBirdPool.length < 2) famousBirdPool = shuffle([...Array(MEDIUM_BIRDS.length).keys()]);
     return [MEDIUM_BIRDS[famousBirdPool.pop()], MEDIUM_BIRDS[famousBirdPool.pop()]];
   }
-  if (birdPool.length < 2) birdPool = shuffle([...Array(ALL_BIRDS.length).keys()]);
-  return [ALL_BIRDS[birdPool.pop()], ALL_BIRDS[birdPool.pop()]];
+  if (birdPool.length < 2) birdPool = shuffle([...Array(EASY_BIRDS.length).keys()]);
+  return [EASY_BIRDS[birdPool.pop()], EASY_BIRDS[birdPool.pop()]];
 }
 
 function startRound() {
