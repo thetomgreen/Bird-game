@@ -171,7 +171,7 @@ const SUPABASE_KEY = 'sb_publishable_k8VKAOPtMFSU-dOVgRrnvg_-H2gexf0';
 // ── Fetch ─────────────────────────────────────────────────────────────────────
 async function fetchEvents() {
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/game_events?select=session_id,question_number,difficulty,selected_difficulty,real_bird_1,real_bird_2,fake_bird,picked_name,correct,response_time_ms,mobile,version,created_at&order=created_at.desc&limit=10000`,
+    `${SUPABASE_URL}/rest/v1/game_events?select=session_id,question_number,difficulty,selected_difficulty,real_bird_1,real_bird_2,fake_bird,picked_name,correct,response_time_ms,mobile,version,event_type,has_fake_image,created_at&order=created_at.desc&limit=10000`,
     { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
   );
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
