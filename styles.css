@@ -553,6 +553,7 @@ h1 {
 .egg-char {
   font-size: 2.8rem;
   display: block;
+  filter: saturate(1.6) brightness(1.1);
 }
 
 .egg-cracks {
