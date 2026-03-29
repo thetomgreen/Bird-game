@@ -572,7 +572,7 @@ function fetchBirdPhoto(bird) {
 // easy:   all birds with photos
 // hard:   fame 1-2 — obscure birds (BIRDS array only, no HARD_BIRDS)
 // expert: HARD_BIRDS only (compound Asian/tropical names)
-const EASY_BIRDS     = BIRDS.filter(b => b.photo && b.fame >= 3);
+const EASY_BIRDS     = BIRDS.filter(b => b.photo && b.fame >= 4);
 const MEDIUM_BIRDS   = BIRDS.filter(b => b.photo && b.fame >= 3 && b.fame <= 4);
 const OBSCURE_BIRDS  = BIRDS.filter(b => b.photo && b.fame <= 2);
 const HARD_BIRDS_P   = HARD_BIRDS.filter(b => b.photo);
