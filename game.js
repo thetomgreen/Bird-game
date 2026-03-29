@@ -401,6 +401,146 @@ const FAKE_BIRD_IMAGES = [
     "name": "Little Dusky-rumped Pytilia",
     "file": "Little_Dusky-rumped_Pytilia.png",
     "difficulty": "expert"
+  },
+  {
+    "name": "Freckled Tumblefinch",
+    "file": "Freckled_Tumblefinch.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Chubby Gogglelark",
+    "file": "Chubby_Gogglelark.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Common Wobbly Warblewren",
+    "file": "Common_Wobbly_Warblewren.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Drizzlechat",
+    "file": "Drizzlechat.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Teetering Wobblesnipe",
+    "file": "Teetering_Wobblesnipe.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Bobblebird",
+    "file": "Bobblebird.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Bouncy Hobbleteal",
+    "file": "Bouncy_Hobbleteal.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Frecklebird",
+    "file": "Frecklebird.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Dawdlemartin",
+    "file": "Dawdlemartin.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Greater Sniffly Mumblegodwit",
+    "file": "Greater_Sniffly_Mumblegodwit.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Muddlebunting",
+    "file": "Muddlebunting.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Wobblesnipe",
+    "file": "Wobblesnipe.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Ruffled Tumblestint",
+    "file": "Ruffled_Tumblestint.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Waddlestint",
+    "file": "Waddlestint.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Throttlesnipe",
+    "file": "Throttlesnipe.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Lesser Scruffy Hobblestint",
+    "file": "Lesser_Scruffy_Hobblestint.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Magnificent Bouncy Muddlewarbler",
+    "file": "Magnificent_Bouncy_Muddlewarbler.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Bouncy Noodlethrush",
+    "file": "Bouncy_Noodlethrush.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Lesser Scruffy Warblestint",
+    "file": "Lesser_Scruffy_Warblestint.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Gogglewren",
+    "file": "Gogglewren.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Bogglemartin",
+    "file": "Bogglemartin.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Pudgy Grumblestint",
+    "file": "Pudgy_Grumblestint.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Sleepy Grumblestint",
+    "file": "Sleepy_Grumblestint.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Waddlethrush",
+    "file": "Waddlethrush.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Doodlesnipe",
+    "file": "Doodlesnipe.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Greater Bouncy Doodlebird",
+    "file": "Greater_Bouncy_Doodlebird.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Crumblestint",
+    "file": "Crumblestint.png",
+    "difficulty": "easy"
+  },
+  {
+    "name": "Northern Chubby Fumblelark",
+    "file": "Northern_Chubby_Fumblelark.png",
+    "difficulty": "easy"
   }
 ];
 
