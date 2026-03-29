@@ -820,9 +820,13 @@ function revealFakeBird(btn) {
     dotsEl.textContent = '.'.repeat(dots);
   }, 200);
 
-  // 0.8s: chick emerging (cracks are drawn by CSS animation from 0.3s)
+  // 0.8s: chick emerging — hide cracks, show chick
   const eggEl = hatching.querySelector('.egg-char');
-  setTimeout(() => { if (eggEl) eggEl.textContent = '🐣'; }, 800);
+  const cracksEl = hatching.querySelector('.egg-cracks');
+  setTimeout(() => {
+    if (eggEl) eggEl.textContent = '🐣';
+    if (cracksEl) cracksEl.style.display = 'none';
+  }, 800);
 
   setTimeout(() => {
     clearInterval(dotsInterval);
