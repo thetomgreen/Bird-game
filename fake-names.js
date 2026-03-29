@@ -7,51 +7,66 @@
 // hard   → medium-style fakes (easier to spot against obscure real birds)
 // expert → ultra-convincing fakes mimicking HARD_BIRDS compound naming patterns
 
+const DIFFICULTY_LEVELS = ['easy', 'medium', 'hard', 'expert'];
+
 let selectedDifficulty = 'auto';
 let adaptiveDifficulty = 'medium';
-let recentResults = [];
+
+// Auto mode tracking
+let autoStartDifficulty = 'medium';
+let autoConsecCorrect = 0;   // consecutive correct at current adaptive difficulty
+let autoConsecWrong = 0;     // consecutive wrong at current adaptive difficulty
+let autoRoundHistory = [];   // [{difficulty, correct}] — for end-screen summary
 
 function getStyle() {
   return selectedDifficulty === 'auto' ? adaptiveDifficulty : selectedDifficulty;
 }
 
-function setDifficulty(level) {
-  selectedDifficulty = level;
-  document.querySelectorAll('.diff-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.level === level);
-  });
-  updateAdaptiveLabel();
-  startGame();
-}
-
 function setDifficultyOnly(level) {
   selectedDifficulty = level;
-  document.querySelectorAll('.diff-btn').forEach(b => {
+  document.querySelectorAll('#end-screen .diff-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.level === level);
   });
   updateAdaptiveLabel();
 }
 
+function resetAutoState() {
+  autoConsecCorrect = 0;
+  autoConsecWrong = 0;
+  autoRoundHistory = [];
+  autoStartDifficulty = adaptiveDifficulty;
+}
+
+// 2 correct in a row at same difficulty → level up
+// 2 wrong in a row at same difficulty  → level down
 function updateAdaptiveDifficulty(correct) {
-  recentResults.push(correct);
-  if (recentResults.length > 5) recentResults.shift();
-  if (recentResults.length < 3) return;
-  const last3 = recentResults.slice(-3);
-  const correct3 = last3.filter(Boolean).length;
-  if (correct3 === 3) {
-    if (adaptiveDifficulty === 'easy')        adaptiveDifficulty = 'medium';
-    else if (adaptiveDifficulty === 'medium') adaptiveDifficulty = 'hard';
-    else if (adaptiveDifficulty === 'hard')   adaptiveDifficulty = 'expert';
-  } else if (correct3 <= 1) {
-    if (adaptiveDifficulty === 'expert')      adaptiveDifficulty = 'hard';
-    else if (adaptiveDifficulty === 'hard')   adaptiveDifficulty = 'medium';
-    else if (adaptiveDifficulty === 'medium') adaptiveDifficulty = 'easy';
+  autoRoundHistory.push({ difficulty: adaptiveDifficulty, correct });
+
+  const idx = DIFFICULTY_LEVELS.indexOf(adaptiveDifficulty);
+
+  if (correct) {
+    autoConsecWrong = 0;
+    autoConsecCorrect++;
+    if (autoConsecCorrect >= 2 && idx < DIFFICULTY_LEVELS.length - 1) {
+      adaptiveDifficulty = DIFFICULTY_LEVELS[idx + 1];
+      autoConsecCorrect = 0;
+      autoConsecWrong = 0;
+    }
+  } else {
+    autoConsecCorrect = 0;
+    autoConsecWrong++;
+    if (autoConsecWrong >= 2 && idx > 0) {
+      adaptiveDifficulty = DIFFICULTY_LEVELS[idx - 1];
+      autoConsecCorrect = 0;
+      autoConsecWrong = 0;
+    }
   }
   updateAdaptiveLabel();
 }
 
 function updateAdaptiveLabel() {
   const el = document.getElementById('adaptive-label');
+  if (!el) return;
   el.textContent = selectedDifficulty === 'auto' ? `(${adaptiveDifficulty})` : '';
 }
 

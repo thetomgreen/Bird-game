@@ -578,7 +578,7 @@ const ALL_BIRDS      = BIRDS.filter(b => b.photo);
 const HARD_BIRDS_P   = HARD_BIRDS.filter(b => b.photo);
 
 // ── Game state ───────────────────────────────────────────────────────────────
-const ROUNDS_PER_GAME = 5;
+const ROUNDS_PER_GAME = 6;
 let questionCount = 0, gameScore = 0;
 let score = 0, streak = 0, bestStreak = 0;
 let currentRound = null, answered = false;
@@ -587,6 +587,8 @@ let famousBirdPool = [];  // shuffled indices for MEDIUM_BIRDS (medium)
 let obscureBirdPool = []; // shuffled indices for OBSCURE_BIRDS (hard)
 let hardBirdPool = [];    // shuffled indices for HARD_BIRDS (expert)
 let photoPromises = [];
+
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 function shuffle(arr) {
   const a = [...arr];
@@ -617,6 +619,7 @@ function pickTwoBirds() {
 
 function startRound() {
   answered = false;
+  updateAdjustButtons();
 
   document.getElementById('question-progress').textContent =
     `Question ${questionCount + 1} of ${ROUNDS_PER_GAME}`;
@@ -804,9 +807,38 @@ function nextRound() {
 
 function showEndScreen() {
   const diffEl = document.getElementById('final-difficulty');
-  diffEl.textContent = selectedDifficulty === 'auto'
-    ? 'Auto'
-    : selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
+  const readyMsg = document.getElementById('auto-ready-msg');
+
+  if (selectedDifficulty === 'auto') {
+    const startLabel = capitalize(autoStartDifficulty);
+    const endLabel = capitalize(adaptiveDifficulty);
+    diffEl.textContent = startLabel === endLabel
+      ? `Auto (${endLabel})`
+      : `Auto (${startLabel} → ${endLabel})`;
+
+    // Check if the last 2 rounds were both correct at the same difficulty
+    const last2 = autoRoundHistory.slice(-2);
+    const readyForNext = last2.length === 2 &&
+      last2[0].correct && last2[1].correct &&
+      last2[0].difficulty === last2[1].difficulty;
+
+    if (readyForNext && readyMsg) {
+      const idx = DIFFICULTY_LEVELS.indexOf(last2[0].difficulty);
+      const nextLevel = idx < DIFFICULTY_LEVELS.length - 1 ? DIFFICULTY_LEVELS[idx + 1] : null;
+      if (nextLevel) {
+        readyMsg.textContent = `You're ready for ${capitalize(nextLevel)}!`;
+        readyMsg.style.display = 'block';
+      } else {
+        readyMsg.textContent = `You've mastered Expert! 🏆`;
+        readyMsg.style.display = 'block';
+      }
+    } else if (readyMsg) {
+      readyMsg.style.display = 'none';
+    }
+  } else {
+    diffEl.textContent = capitalize(selectedDifficulty);
+    if (readyMsg) readyMsg.style.display = 'none';
+  }
 
   const messages = [
     'Better luck next time! 🐣',
@@ -814,13 +846,14 @@ function showEndScreen() {
     'Not bad! 🐦',
     'Nice work! 🦅',
     'Great game! 🦜',
+    'Almost perfect! 🦢',
     'Perfect score! 🏆'
   ];
 
   document.getElementById('end-title').textContent = messages[gameScore] ?? 'Game Over!';
   document.getElementById('final-score').textContent = gameScore;
 
-  document.querySelectorAll('.diff-btn').forEach(b => {
+  document.querySelectorAll('#end-screen .diff-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.level === selectedDifficulty);
   });
 
@@ -831,9 +864,50 @@ function showEndScreen() {
 function startGame() {
   questionCount = 0;
   gameScore = 0;
+  if (selectedDifficulty === 'auto') resetAutoState();
   document.getElementById('end-screen').style.display = 'none';
   document.getElementById('game-screen').style.display = 'block';
   startRound();
 }
 
-startGame();
+// Called from the welcome screen difficulty cards
+function pickDifficulty(level) {
+  selectedDifficulty = level;
+  document.getElementById('welcome-screen').style.display = 'none';
+  document.getElementById('score-bar').style.display = 'flex';
+  startGame();
+}
+
+// Make it easier (direction = -1) or harder (direction = +1) — restarts the game
+function adjustDifficulty(direction) {
+  const current = getStyle();
+  const idx = DIFFICULTY_LEVELS.indexOf(current);
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= DIFFICULTY_LEVELS.length) return;
+  const newLevel = DIFFICULTY_LEVELS[newIdx];
+  selectedDifficulty = newLevel;
+  showToast(`Restarting at ${capitalize(newLevel)}`);
+  setTimeout(() => startGame(), 1200);
+}
+
+function updateAdjustButtons() {
+  const current = getStyle();
+  const idx = DIFFICULTY_LEVELS.indexOf(current);
+  const easierBtn = document.getElementById('easier-btn');
+  const harderBtn = document.getElementById('harder-btn');
+  if (easierBtn) easierBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
+  if (harderBtn) harderBtn.style.visibility = idx === DIFFICULTY_LEVELS.length - 1 ? 'hidden' : 'visible';
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1200);
+}
+
+// Show welcome screen on load — game starts after difficulty is chosen
+document.getElementById('welcome-screen').style.display = 'flex';
+document.getElementById('game-screen').style.display = 'none';
+document.getElementById('score-bar').style.display = 'none';
