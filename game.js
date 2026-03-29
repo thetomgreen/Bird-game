@@ -720,19 +720,7 @@ async function handleGuess(pickedFake, pickedName) {
     label.className = `result-label ${isFakeBtn ? 'label-fake' : 'label-real'}`;
     label.textContent = isFakeBtn ? '🤖 Fake' : '🐦 Real';
     footer.appendChild(label);
-    // Sound button for real birds that have a sound URL
-    if (!isFakeBtn) {
-      const birdIdx = parseInt(btn.dataset.birdIdx);
-      const bird = currentRound.real[birdIdx];
-      if (bird.sound) {
-        const soundBtn = document.createElement('button');
-        soundBtn.className = 'sound-btn';
-        soundBtn.textContent = '🔈';
-        soundBtn.title = `Hear the ${bird.name}`;
-        soundBtn.onclick = (e) => { e.stopPropagation(); playBirdSound(bird.sound, soundBtn); };
-        footer.appendChild(soundBtn);
-      }
-    }
+
     if (wasClicked) {
       const icon = document.createElement('div');
       icon.className = pickedFake ? 'result-icon correct-icon' : 'result-icon wrong-icon';
@@ -848,75 +836,6 @@ function revealFakeBird(btn) {
   }, 1400);
 }
 
-// ── Bird sound playback ───────────────────────────────────────────────────────
-let activeSoundSource = null;
-let activeSoundBtn = null;
-
-async function playBirdSound(url, btn) {
-  // Stop any currently playing sound
-  if (activeSoundSource) {
-    try { activeSoundSource.stop(); } catch(e) {}
-    activeSoundSource = null;
-  }
-  if (activeSoundBtn && activeSoundBtn !== btn) {
-    activeSoundBtn.textContent = '🔈';
-  }
-  // Toggle off if same button clicked while playing
-  if (activeSoundBtn === btn && btn.textContent === '🔊') {
-    activeSoundBtn = null;
-    btn.textContent = '🔈';
-    return;
-  }
-
-  btn.textContent = '⏳';
-  activeSoundBtn = btn;
-
-  try {
-    // Web Audio API path — allows trimming leading silence
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
-
-    // Find loudest 0.5s window, start 0.5s before it
-    const data = audioBuffer.getChannelData(0);
-    const sr = audioBuffer.sampleRate;
-    const windowSize = Math.floor(sr * 0.5);
-    const scanSamples = Math.min(data.length, sr * 120); // scan up to 2 min
-    let bestRms = -1, bestWindow = 0;
-    for (let i = 0; i + windowSize < scanSamples; i += windowSize) {
-      let sum = 0;
-      for (let j = i; j < i + windowSize; j++) sum += data[j] * data[j];
-      const rms = Math.sqrt(sum / windowSize);
-      if (rms > bestRms) { bestRms = rms; bestWindow = i; }
-    }
-    const startSample = Math.max(0, bestWindow - Math.floor(sr * 0.5));
-
-    const source = ctx.createBufferSource();
-    source.buffer = audioBuffer;
-    source.connect(ctx.destination);
-    source.start(0, startSample / sr, 6);
-    activeSoundSource = source;
-    btn.textContent = '🔊';
-
-    source.onended = () => {
-      if (activeSoundBtn === btn) { btn.textContent = '🔈'; activeSoundBtn = null; }
-      ctx.close();
-    };
-
-  } catch (e) {
-    // CORS blocked or Web Audio unavailable — fall back to HTML5 Audio from start
-    const audio = new Audio(url);
-    activeSoundSource = audio;
-    audio.play().then(() => {
-      btn.textContent = '🔊';
-      setTimeout(() => {
-        audio.pause();
-        if (activeSoundBtn === btn) { btn.textContent = '🔈'; activeSoundBtn = null; }
-      }, 6000);
-    }).catch(() => { btn.textContent = '🔈'; activeSoundBtn = null; });
-  }
-}
 
 function nextRound() {
   questionCount++;
