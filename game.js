@@ -754,7 +754,14 @@ async function handleGuess(pickedFake, pickedName) {
           🎨 Imagine this bird
         </button>
         <div class="fake-bird-hatching" style="display:none">
-          <div class="egg-anim">🥚</div>
+          <div class="egg-anim-wrap">
+            <span class="egg-char">🥚</span>
+            <svg class="egg-cracks" viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg">
+              <path class="crack crack-a" d="M26,8 L22,20 L29,31 L24,46"/>
+              <path class="crack crack-b" d="M22,20 L14,27"/>
+              <path class="crack crack-c" d="M29,31 L37,37"/>
+            </svg>
+          </div>
           <p class="hatching-text"><span class="hl" style="--i:0">h</span><span class="hl" style="--i:1">a</span><span class="hl" style="--i:2">t</span><span class="hl" style="--i:3">c</span><span class="hl" style="--i:4">h</span><span class="hl" style="--i:5">i</span><span class="hl" style="--i:6">n</span><span class="hl" style="--i:7">g</span><span class="hatching-dots"></span></p>
         </div>
         <div class="fake-bird-reveal" style="display:none">
@@ -813,11 +820,9 @@ function revealFakeBird(btn) {
     dotsEl.textContent = '.'.repeat(dots);
   }, 200);
 
-  const eggEl = hatching.querySelector('.egg-anim');
-  // 0.3s: crack
-  setTimeout(() => { if (eggEl) eggEl.textContent = '🐣'; }, 300);
-  // 0.8s: chick emerging
-  setTimeout(() => { if (eggEl) eggEl.textContent = '🐥'; }, 800);
+  // 0.8s: chick emerging (cracks are drawn by CSS animation from 0.3s)
+  const eggEl = hatching.querySelector('.egg-char');
+  setTimeout(() => { if (eggEl) eggEl.textContent = '🐣'; }, 800);
 
   setTimeout(() => {
     clearInterval(dotsInterval);
