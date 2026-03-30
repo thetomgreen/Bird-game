@@ -102,7 +102,7 @@
     <div class="stat-card"><div class="label">Today</div><div class="value" id="s-today">—</div><div class="sub">questions</div></div>
     <div class="stat-card"><div class="label">Games / session</div><div class="value" id="s-gps">—</div><div class="sub">avg</div></div>
     <div class="stat-card"><div class="label">Games completed</div><div class="value" id="s-complete">—</div><div class="sub">full game</div></div>
-    <div class="stat-card"><div class="label">Images revealed</div><div class="value" id="s-revealed">—</div><div class="sub">of available</div></div>
+    <div class="stat-card"><div class="label">Images revealed</div><div class="value" id="s-revealed">—</div><div class="sub" id="s-revealed-raw">of available</div></div>
   </div>
 
   <div class="charts-row">
@@ -293,6 +293,7 @@ function renderCharts(events) {
   document.getElementById('s-gps').textContent       = gamesPerSession;
   document.getElementById('s-complete').textContent  = completePct;
   document.getElementById('s-revealed').textContent  = revealPct;
+  document.getElementById('s-revealed-raw').textContent = `${revealEvents.length} of ${imageAvailable}`;
 
   // ── Activity chart (questions per day, last 30 days)
   const days = last30Days();
